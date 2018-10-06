@@ -1,8 +1,6 @@
 arc4
 ====
 
-**This library is now working with Python 2 only!**
-
 A small and insanely fast ARCFOUR (RC4) cipher implementation of Python.
 
 * Strongly focused on performance; entire source code is written in C.

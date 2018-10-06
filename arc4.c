@@ -51,36 +51,17 @@ static void arc4_crypt(arc4_state *state, unsigned char *buf, Py_ssize_t buflen)
 
 typedef struct arc4_ARC4 {
     PyObject_HEAD
-    arc4_state *state;
+    arc4_state state;
 } arc4_ARC4Object;
-
-static void arc4_ARC4_dealloc(arc4_ARC4Object *self) {
-    PyMem_Free(self->state);
-    self->ob_type->tp_free((PyObject *)self);
-}
-
-static PyObject *arc4_ARC4_new(PyTypeObject *type, PyObject *args, PyObject *kwargs) {
-    arc4_ARC4Object *self = NULL;
-
-    self = (arc4_ARC4Object *)(type->tp_alloc(type, 0));
-    if (self != NULL) {
-        self->state = (arc4_state *)PyMem_Malloc(sizeof(arc4_state));
-        if (self->state == NULL) {
-            Py_DECREF(self);
-            return NULL;
-        }
-    }
-    return (PyObject *)self;
-}
 
 static int arc4_ARC4_init(arc4_ARC4Object *self, PyObject *args, PyObject *kwargs) {
     const char *key = NULL;
     Py_ssize_t keylen = 0;
 
-    if (!PyArg_ParseTuple(args, "s#:__init__", &key, &keylen)) {
+    if (!PyArg_ParseTuple(args, "s#", &key, &keylen)) {
         return -1;
     }
-    arc4_init(self->state, (const unsigned char *)key, keylen);
+    arc4_init(&(self->state), (const unsigned char *)key, keylen);
     return 0;
 }
 
@@ -95,8 +76,8 @@ static PyObject *arc4_ARC4_crypt(arc4_ARC4Object *self, PyObject *args) {
     }
     buf = PyMem_Malloc(sizeof(char) * buflen);
     memcpy(buf, bufstring, buflen);
-    arc4_crypt(self->state, (unsigned char *)buf, buflen);
-    rv = PyString_FromStringAndSize((const char *)buf, buflen);
+    arc4_crypt(&(self->state), (unsigned char *)buf, buflen);
+    rv = PyBytes_FromStringAndSize((const char *)buf, buflen);
     return rv;
 }
 
@@ -111,7 +92,7 @@ static PyTypeObject arc4_ARC4Type = {
     "arc4.ARC4",
     sizeof(arc4_ARC4Object),
     0, /* tp_itemsize */
-    (destructor)arc4_ARC4_dealloc, /* tp_dealloc */
+    0, /* tp_dealloc */
     0, /* tp_print */
     0, /* tp_getattr */
     0, /* tp_setattr */
@@ -144,11 +125,7 @@ static PyTypeObject arc4_ARC4Type = {
     0, /* tp_dictoffset */
     (initproc)arc4_ARC4_init, /* tp_init */
     0, /* tp_alloc */
-    arc4_ARC4_new, /* tp_new */
-};
-
-static PyMethodDef arc4_methods[] = {
-    { NULL }
+    PyType_GenericNew, /* tp_new */
 };
 
 #if PY_MAJOR_VERSION >= 3
@@ -157,11 +134,22 @@ static struct PyModuleDef arc4_module = {
     "arc4",
     NULL,
     -1,
-    arc4_methods
+    NULL
 };
 
 PyMODINIT_FUNC PyInit_arc4(void) {
-    return PyModule_Create(&arc4_module);
+    PyObject *m;
+
+    if (PyType_Ready(&arc4_ARC4Type) < 0) {
+        return NULL;
+    }
+    m = PyModule_Create(&arc4_module);
+    if (m == NULL) {
+        return NULL;
+    }
+    Py_INCREF(&arc4_ARC4Type);
+    PyModule_AddObject(m, "ARC4", (PyObject *)&arc4_ARC4Type);
+    return m;
 }
 #else
 PyMODINIT_FUNC initarc4(void) {
@@ -170,7 +158,7 @@ PyMODINIT_FUNC initarc4(void) {
     if (PyType_Ready(&arc4_ARC4Type) < 0) {
         return;
     }
-    m = Py_InitModule("arc4", arc4_methods);
+    m = Py_InitModule("arc4", NULL);
     if (m == NULL) {
         return;
     }
