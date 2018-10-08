@@ -78,6 +78,7 @@ static PyObject *arc4_ARC4_crypt(arc4_ARC4Object *self, PyObject *args) {
     memcpy(buf, bufstring, buflen);
     arc4_crypt(&(self->state), (unsigned char *)buf, buflen);
     rv = PyBytes_FromStringAndSize((const char *)buf, buflen);
+    PyMem_Free(buf);
     return rv;
 }
 
