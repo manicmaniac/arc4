@@ -1,6 +1,9 @@
 arc4
 ====
 
+.. image:: https://travis-ci.org/manicmaniac/arc4.svg?branch=master
+   :target: https://travis-ci.org/manicmaniac/arc4
+
 A small and insanely fast ARCFOUR (RC4) cipher implementation of Python.
 
 * Strongly focused on performance; entire source code is written in C.
