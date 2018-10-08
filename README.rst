@@ -28,7 +28,11 @@ The whole benchmark code is in ``./benchmark.py``.
 Install
 -------
 
-Clone the repo and do install::
+Install from PyPI::
+
+   pip install arc4
+
+Or clone the repo and do install::
 
    git clone https://github.com/manicmaniac/arc4.git
    cd arc4
