@@ -11,11 +11,11 @@ Benchmark
 
 Below is benchmark metrics against 3 major RC4 implementations.
 
-arc4 is 36 % faster than the de facto `PyCrypto <https://pypi.org/project/pycrypto/>`_ library.
-Also, 1554 % faster than pure-Python `rc4 <https://pypi.org/project/rc4/>`_ library.
+arc4 is 67 % faster than the de facto `PyCrypto <https://pypi.org/project/pycrypto/>`_ library.
+Also, 1889 % faster than pure-Python `rc4 <https://pypi.org/project/rc4/>`_ library.
 
 ========= ==============
-arc4      0.399230957031
+arc4      0.332659006119
 PyCrypto  0.544879198074
 rc4       6.60579204559
 ========= ==============
