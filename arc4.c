@@ -4,7 +4,7 @@
 typedef struct arc4_state {
     unsigned char x;
     unsigned char y;
-    unsigned char s[255];
+    unsigned char s[256];
 } arc4_state;
 
 static void arc4_init(arc4_state *state, const unsigned char *key, Py_ssize_t keylen) {
