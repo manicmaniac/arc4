@@ -3,6 +3,11 @@ arc4
 
 .. image:: https://travis-ci.org/manicmaniac/arc4.svg?branch=master
    :target: https://travis-ci.org/manicmaniac/arc4
+   :alt: Build Status
+
+.. image:: https://readthedocs.org/projects/arc4/badge/?version=latest
+   :target: https://arc4.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
 
 A small and insanely fast ARCFOUR (RC4) cipher implementation of Python.
 
