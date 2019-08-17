@@ -82,11 +82,72 @@ static PyObject *arc4_ARC4_crypt(arc4_ARC4Object *self, PyObject *args) {
     return rv;
 }
 
+static const char arc4_ARC4_decrypt_doc[] = "decrypt(data: bytes) -> bytes\n"
+                                            "\n"
+                                            "Decrypt cipher with a given key.\n"
+                                            "\n"
+                                            "Parameters\n"
+                                            "----------\n"
+                                            "data : bytes\n"
+                                            "    Encrypted data.\n"
+                                            "\n"
+                                            "Returns\n"
+                                            "----------\n"
+                                            "bytes\n"
+                                            "    Decrypted data.\n"
+                                            "\n"
+                                            "Notes\n"
+                                            "----------\n"
+                                            "This method is defined for readability although it is identical to :func:`~arc4.ARC4.encrypt`.\n"
+                                            "\n"
+                                            "Examples\n"
+                                            "--------\n"
+                                            ">>> arc4 = ARC4(b'spam')\n"
+                                            ">>> arc4.decrypt(b'\\xda/S')\n"
+                                            "b'ham'\n";
+
+static const char arc4_ARC4_encrypt_doc[] = "encrypt(data: bytes) -> bytes\n"
+                                            "\n"
+                                            "Encrypt cipher with a given key.\n"
+                                            "\n"
+                                            "Parameters\n"
+                                            "----------\n"
+                                            "data : bytes\n"
+                                            "    Decrypted data.\n"
+                                            "\n"
+                                            "Returns\n"
+                                            "----------\n"
+                                            "bytes\n"
+                                            "    Encrypted data.\n"
+                                            "\n"
+                                            "Notes\n"
+                                            "----------\n"
+                                            "This method is defined for readability although it is identical to :func:`~arc4.ARC4.decrypt`.\n"
+                                            "\n"
+                                            "Examples\n"
+                                            "--------\n"
+                                            ">>> arc4 = ARC4(b'spam')\n"
+                                            ">>> arc4.encrypt(b'ham')\n"
+                                            "b'\\xda/S'\n";
+
 static PyMethodDef arc4_ARC4_methods[] = {
-    { "decrypt", (PyCFunction)arc4_ARC4_crypt, METH_VARARGS, "" },
-    { "encrypt", (PyCFunction)arc4_ARC4_crypt, METH_VARARGS, "" },
+    { "decrypt", (PyCFunction)arc4_ARC4_crypt, METH_VARARGS, arc4_ARC4_decrypt_doc },
+    { "encrypt", (PyCFunction)arc4_ARC4_crypt, METH_VARARGS, arc4_ARC4_encrypt_doc },
     { NULL }
 };
+
+static const char arc4_ARC4Type_doc[] = "A class represents a session of RC4 stream cipher.\n"
+                                        "\n"
+                                        "__init__(key: bytes)\n"
+                                        "\n"
+                                        "Parameters\n"
+                                        "----------\n"
+                                        "key : bytes\n"
+                                        "    A key to encrypt or decrypt.\n"
+                                        "\n"
+                                        "Notes\n"
+                                        "-----\n"
+                                        "You have to initialize an instance in the beginning of each operations.\n";
 
 static PyTypeObject arc4_ARC4Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
@@ -109,7 +170,7 @@ static PyTypeObject arc4_ARC4Type = {
     0, /* tp_setattro */
     0, /* tp_as_buffer */
     Py_TPFLAGS_DEFAULT, /* tp_flags */
-    "", /* tp_doc */
+    arc4_ARC4Type_doc, /* tp_doc */
     0, /* tp_traverse */
     0, /* tp_clear */
     0, /* tp_richcompare */
