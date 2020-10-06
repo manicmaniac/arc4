@@ -41,14 +41,18 @@ LOREM_ARC4 = b"""\xf0\xa8\x59\xec\xdf\x9d\xbd\x95\x52\x91\x66\x72\x50\x01\x0d\
 
 
 class TestARC4(unittest.TestCase):
-    def setUp(self):
-        self.arc4 = arc4.ARC4(KEY)
+    def test_init_with_zero_length_key_raises_error(self):
+        with self.assertRaises(ValueError) as e:
+            arc4.ARC4(b'')
+            self.assertEqual('invalid key length: 0', e.message)
 
     def test_encrypt(self):
-        self.assertEqual(LOREM_ARC4, self.arc4.encrypt(LOREM))
+        cipher = arc4.ARC4(KEY)
+        self.assertEqual(LOREM_ARC4, cipher.encrypt(LOREM))
 
     def test_decrypt(self):
-        self.assertEqual(LOREM, self.arc4.decrypt(LOREM_ARC4))
+        cipher = arc4.ARC4(KEY)
+        self.assertEqual(LOREM, cipher.decrypt(LOREM_ARC4))
 
 
 def load_tests(loader, tests, ignore):
