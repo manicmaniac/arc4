@@ -61,6 +61,10 @@ static int arc4_ARC4_init(arc4_ARC4Object *self, PyObject *args, PyObject *kwarg
     if (!PyArg_ParseTuple(args, "s#", &key, &keylen)) {
         return -1;
     }
+    if (keylen <= 0) {
+        PyErr_Format(PyExc_ValueError, "invalid key length: %zd", keylen);
+        return -1;
+    }
     arc4_init(&(self->state), (const unsigned char *)key, keylen);
     return 0;
 }
