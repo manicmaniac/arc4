@@ -20,7 +20,7 @@ setup(
     author_email='rito.0305@gmail.com',
     url='https://github.com/manicmaniac/arc4',
     ext_modules=[
-        Extension('arc4', sources=['arc4.c'], extra_compile_args=['-O3'])
+        Extension('arc4', sources=['arc4.c'], extra_compile_args=['-O2'])
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
