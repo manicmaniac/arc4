@@ -61,6 +61,10 @@ static int arc4_ARC4_init(arc4_ARC4Object *self, PyObject *args, PyObject *kwarg
     if (!PyArg_ParseTuple(args, "s#", &key, &keylen)) {
         return -1;
     }
+    if (keylen <= 0) {
+        PyErr_Format(PyExc_ValueError, "invalid key length: %zd", keylen);
+        return -1;
+    }
     arc4_init(&(self->state), (const unsigned char *)key, keylen);
     return 0;
 }
@@ -144,6 +148,11 @@ static const char arc4_ARC4Type_doc[] = "A class represents a session of RC4 str
                                         "----------\n"
                                         "key : bytes\n"
                                         "    A key to encrypt or decrypt.\n"
+                                        "\n"
+                                        "Raises\n"
+                                        "------\n"
+                                        "ValueError\n"
+                                        "    When the key length is zero.\n"
                                         "\n"
                                         "Notes\n"
                                         "-----\n"
