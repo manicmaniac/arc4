@@ -149,6 +149,11 @@ static const char arc4_ARC4Type_doc[] = "A class represents a session of RC4 str
                                         "key : bytes\n"
                                         "    A key to encrypt or decrypt.\n"
                                         "\n"
+                                        "Raises\n"
+                                        "------\n"
+                                        "ValueError\n"
+                                        "    When the key length is zero.\n"
+                                        "\n"
                                         "Notes\n"
                                         "-----\n"
                                         "You have to initialize an instance in the beginning of each operations.\n";
