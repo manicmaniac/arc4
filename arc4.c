@@ -49,12 +49,12 @@ static void arc4_crypt(struct arc4_state *state, unsigned char *buf, Py_ssize_t 
     state->y = y;
 }
 
-typedef struct arc4_ARC4 {
+struct arc4_ARC4 {
     PyObject_HEAD
     struct arc4_state state;
-} arc4_ARC4Object;
+};
 
-static int arc4_ARC4_init(arc4_ARC4Object *self, PyObject *args, PyObject *kwargs) {
+static int arc4_ARC4_init(struct arc4_ARC4 *self, PyObject *args, PyObject *kwargs) {
     const char *key = NULL;
     Py_ssize_t keylen = 0;
 
@@ -69,7 +69,7 @@ static int arc4_ARC4_init(arc4_ARC4Object *self, PyObject *args, PyObject *kwarg
     return 0;
 }
 
-static PyObject *arc4_ARC4_crypt(arc4_ARC4Object *self, PyObject *args) {
+static PyObject *arc4_ARC4_crypt(struct arc4_ARC4 *self, PyObject *args) {
     const char *bufstring = NULL;
     char *buf = NULL;
     Py_ssize_t buflen = 0;
@@ -161,7 +161,7 @@ static const char arc4_ARC4Type_doc[] = "A class represents a session of RC4 str
 static PyTypeObject arc4_ARC4Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "arc4.ARC4",
-    sizeof(arc4_ARC4Object),
+    sizeof(struct arc4_ARC4),
     0, /* tp_itemsize */
     0, /* tp_dealloc */
     0, /* tp_print */
