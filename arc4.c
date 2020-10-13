@@ -1,13 +1,13 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
-typedef struct arc4_state {
+struct arc4_state {
     unsigned char x;
     unsigned char y;
     unsigned char s[256];
-} arc4_state;
+};
 
-static void arc4_init(arc4_state *state, const unsigned char *key, Py_ssize_t keylen) {
+static void arc4_init(struct arc4_state *state, const unsigned char *key, Py_ssize_t keylen) {
     int i;
     unsigned char j, k;
 
@@ -25,7 +25,7 @@ static void arc4_init(arc4_state *state, const unsigned char *key, Py_ssize_t ke
     }
 }
 
-static void arc4_crypt(arc4_state *state, unsigned char *buf, Py_ssize_t buflen) {
+static void arc4_crypt(struct arc4_state *state, unsigned char *buf, Py_ssize_t buflen) {
     unsigned char x;
     unsigned char y;
     unsigned char *s;
@@ -51,7 +51,7 @@ static void arc4_crypt(arc4_state *state, unsigned char *buf, Py_ssize_t buflen)
 
 typedef struct arc4_ARC4 {
     PyObject_HEAD
-    arc4_state state;
+    struct arc4_state state;
 } arc4_ARC4Object;
 
 static int arc4_ARC4_init(arc4_ARC4Object *self, PyObject *args, PyObject *kwargs) {
