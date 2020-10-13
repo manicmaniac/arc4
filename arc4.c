@@ -2,9 +2,7 @@
 #include <Python.h>
 
 struct arc4_state {
-    unsigned char x;
-    unsigned char y;
-    unsigned char s[256];
+    unsigned char x, y, s[256];
 };
 
 static void arc4_init(struct arc4_state *state, const unsigned char *key, Py_ssize_t keylen) {
@@ -26,12 +24,8 @@ static void arc4_init(struct arc4_state *state, const unsigned char *key, Py_ssi
 }
 
 static void arc4_crypt(struct arc4_state *state, unsigned char *buf, Py_ssize_t buflen) {
-    unsigned char x;
-    unsigned char y;
-    unsigned char *s;
+    unsigned char x, y, *s, sx, sy;
     Py_ssize_t i;
-    unsigned char sx;
-    unsigned char sy;
 
     x = state->x;
     y = state->y;
