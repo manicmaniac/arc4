@@ -1,0 +1,31 @@
+---
+name: Build Wheels
+on:
+  repository_dispatch:
+    types:
+    - build-wheels
+jobs:
+  build-wheels:
+    runs-on: "${{ matrix.os }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+        - macOS-latest
+        - ubuntu-latest
+        - windows-latest
+        python-version:
+        - 2.7
+        - 3.5
+        - 3.6
+        - 3.7
+        - 3.8
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: "${{ matrix.python-version }}"
+    - run: python setup.py bdist_wheel
+    - uses: actions/upload-artifact@v2
+      with:
+        path: dist/*whl
