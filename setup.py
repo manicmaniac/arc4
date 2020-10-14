@@ -10,7 +10,7 @@ with open('README.rst') as f:
 
 setup(
     name='arc4',
-    version='0.0.3',
+    version='0.0.4',
     description=(
         'A small and insanely fast ARCFOUR (RC4) cipher implementation ' +
         'of Python'
