@@ -5,7 +5,7 @@ struct arc4_state {
     unsigned char x, y, s[256];
 };
 
-static void arc4_init(struct arc4_state *state, const unsigned char *key, Py_ssize_t keylen) {
+static void arc4_init(struct arc4_state *state, const unsigned char *key, Py_ssize_t key_size) {
     int i;
     unsigned char j, k;
 
@@ -16,28 +16,28 @@ static void arc4_init(struct arc4_state *state, const unsigned char *key, Py_ssi
     }
     j = 0;
     for (i = 0; i < 256; i++) {
-        j += state->s[i] + key[i % keylen];
+        j += state->s[i] + key[i % key_size];
         k = state->s[i];
         state->s[i] = state->s[j];
         state->s[j] = k;
     }
 }
 
-static void arc4_crypt(struct arc4_state *state, unsigned char *buf, Py_ssize_t buflen) {
+static void arc4_crypt(struct arc4_state *state, unsigned char *buffer, Py_ssize_t buffer_size) {
     unsigned char x, y, *s, sx, sy;
     Py_ssize_t i;
 
     x = state->x;
     y = state->y;
     s = state->s;
-    for (i = 0; i < buflen; i++) {
+    for (i = 0; i < buffer_size; i++) {
         x++;
         y += s[x];
         sx = s[x];
         sy = s[y];
         s[x] = sy;
         s[y] = sx;
-        buf[i] ^= s[(sx + sy) & 0xFF];
+        buffer[i] ^= s[(sx + sy) & 0xFF];
     }
     state->x = x;
     state->y = y;
@@ -50,34 +50,34 @@ struct arc4_ARC4 {
 
 static int arc4_ARC4_init(struct arc4_ARC4 *self, PyObject *args, PyObject *kwargs) {
     const char *key = NULL;
-    Py_ssize_t keylen = 0;
+    Py_ssize_t key_size = 0;
 
-    if (!PyArg_ParseTuple(args, "s#", &key, &keylen)) {
+    if (!PyArg_ParseTuple(args, "s#", &key, &key_size)) {
         return -1;
     }
-    if (keylen <= 0) {
-        PyErr_Format(PyExc_ValueError, "invalid key length: %zd", keylen);
+    if (key_size <= 0) {
+        PyErr_Format(PyExc_ValueError, "invalid key length: %zd", key_size);
         return -1;
     }
-    arc4_init(&(self->state), (const unsigned char *)key, keylen);
+    arc4_init(&(self->state), (const unsigned char *)key, key_size);
     return 0;
 }
 
 static PyObject *arc4_ARC4_crypt(struct arc4_ARC4 *self, PyObject *args) {
-    const char *bufstring = NULL;
-    char *buf = NULL;
-    Py_ssize_t buflen = 0;
-    PyObject *rv = NULL;
+    const char *buffer = NULL;
+    char *copied_buffer = NULL;
+    Py_ssize_t buffer_size = 0;
+    PyObject *bytes = NULL;
 
-    if (!PyArg_ParseTuple(args, "s#:crypt", &bufstring, &buflen)) {
+    if (!PyArg_ParseTuple(args, "s#:crypt", &buffer, &buffer_size)) {
         return NULL;
     }
-    buf = PyMem_Malloc(sizeof(char) * buflen);
-    memcpy(buf, bufstring, buflen);
-    arc4_crypt(&(self->state), (unsigned char *)buf, buflen);
-    rv = PyBytes_FromStringAndSize((const char *)buf, buflen);
-    PyMem_Free(buf);
-    return rv;
+    copied_buffer = PyMem_Malloc(sizeof(char) * buffer_size);
+    memcpy(copied_buffer, buffer, buffer_size);
+    arc4_crypt(&(self->state), (unsigned char *)copied_buffer, buffer_size);
+    bytes = PyBytes_FromStringAndSize((const char *)copied_buffer, buffer_size);
+    PyMem_Free(copied_buffer);
+    return bytes;
 }
 
 static const char arc4_ARC4_decrypt_doc[] = "decrypt(data: bytes) -> bytes\n"
@@ -203,31 +203,31 @@ static struct PyModuleDef arc4_module = {
 };
 
 PyMODINIT_FUNC PyInit_arc4(void) {
-    PyObject *m;
+    PyObject *module;
 
     if (PyType_Ready(&arc4_ARC4Type) < 0) {
         return NULL;
     }
-    m = PyModule_Create(&arc4_module);
-    if (m == NULL) {
+    module = PyModule_Create(&arc4_module);
+    if (module == NULL) {
         return NULL;
     }
     Py_INCREF(&arc4_ARC4Type);
-    PyModule_AddObject(m, "ARC4", (PyObject *)&arc4_ARC4Type);
-    return m;
+    PyModule_AddObject(module, "ARC4", (PyObject *)&arc4_ARC4Type);
+    return module;
 }
 #else
 PyMODINIT_FUNC initarc4(void) {
-    PyObject *m;
+    PyObject *module;
 
     if (PyType_Ready(&arc4_ARC4Type) < 0) {
         return;
     }
-    m = Py_InitModule("arc4", NULL);
-    if (m == NULL) {
+    module = Py_InitModule("arc4", NULL);
+    if (module == NULL) {
         return;
     }
     Py_INCREF(&arc4_ARC4Type);
-    PyModule_AddObject(m, "ARC4", (PyObject *)&arc4_ARC4Type);
+    PyModule_AddObject(module, "ARC4", (PyObject *)&arc4_ARC4Type);
 }
 #endif /* PY_MAJOR_VERSION >= 3 */
