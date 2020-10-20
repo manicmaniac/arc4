@@ -9,11 +9,11 @@ static void arc4_init(struct arc4_state *state, const unsigned char *key, Py_ssi
     int i;
     unsigned char j, k;
 
+    state->x = 0;
+    state->y = 0;
     for (i = 0; i < 256; i++) {
         state->s[i] = (unsigned char)i;
     }
-    state->x = 0;
-    state->y = 0;
     j = 0;
     for (i = 0; i < 256; i++) {
         j += state->s[i] + key[i % keylen];
