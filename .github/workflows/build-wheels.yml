@@ -9,7 +9,6 @@ jobs:
       matrix:
         os:
         - macOS-latest
-        - ubuntu-latest
         - windows-latest
         python-version:
         - 2.7
@@ -32,3 +31,22 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         path: dist/*whl
+  build-manylinux-wheels:
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/pypa/manylinux_2_24_x86_64
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+        - cp36-cp36m
+        - cp37-cp37m
+        - cp38-cp38
+        - cp39-cp39
+    steps:
+    - uses: actions/checkout@v2
+    - run: /opt/python/${{ matrix.python-version }}/bin/pip wheel .
+    - run: auditwheel repair arc4-*-linux*.whl --plat manylinux_2_17_x86_64
+    - uses: actions/upload-artifact@v2
+      with:
+        path: wheelhouse/arc4-*-manylinux*.whl
