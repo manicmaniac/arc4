@@ -19,14 +19,16 @@ Benchmark
 
 Below is benchmark metrics against 3 major RC4 implementations.
 
-arc4 is 67 % faster than the de facto `PyCrypto <https://pypi.org/project/pycrypto/>`_ library.
-Also, 1889 % faster than pure-Python `rc4 <https://pypi.org/project/rc4/>`_ library.
+.. image:: https://user-images.githubusercontent.com/1672393/149629214-79b44d7b-fa0a-4d28-bb93-4ab8604aef44.png
+   :alt: Seconds for decrypting 1KB * 50,000 times
 
-========= ==============
-arc4      0.332659006119
-PyCrypto  0.544879198074
-rc4       6.60579204559
-========= ==============
+.. table:: Seconds for decrypting 1KB * 50,000 times
+
+================================================= =========
+`arc4 <https://pypi.org/project/arc4/>`_          0.212 sec
+`PyCrypto <https://pypi.org/project/pycrypto/>`_  0.511 sec
+`rc4 <https://pypi.org/project/rc4/>`_            3.72  sec
+================================================= =========
 
 The whole benchmark code is in ``./benchmark.py``.
 
@@ -59,6 +61,13 @@ Because RC4 is a stream cipher, you must initialize RC4 object in the beginning 
 
    arc4 = ARC4('key')
    arc4.decrypt(cipher)
+
+Documents
+---------
+
+Here is the API reference.
+
+https://arc4.readthedocs.io/en/latest/
 
 Testing
 -------
