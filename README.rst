@@ -62,6 +62,13 @@ Because RC4 is a stream cipher, you must initialize RC4 object in the beginning 
    arc4 = ARC4('key')
    arc4.decrypt(cipher)
 
+Documents
+---------
+
+Here is the API reference.
+
+https://arc4.readthedocs.io/en/latest/
+
 Testing
 -------
 
