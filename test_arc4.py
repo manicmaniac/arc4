@@ -1,6 +1,10 @@
+# coding:utf-8
+
 from __future__ import unicode_literals
 
 import doctest
+import functools
+import sys
 import unittest
 
 import arc4
@@ -39,6 +43,15 @@ LOREM_ARC4 = b"""\xf0\xa8\x59\xec\xdf\x9d\xbd\x95\x52\x91\x66\x72\x50\x01\x0d\
 \x88\x2c\x21\x74\xed\xa3\x5c\x7c\xa7\x03\x42\x4d\x21\x50\xe2\x9b\x2b\x99\x88\
 \x1e\xd4\x53\xda\x1c\xa2\xc7\x5b\xb5\x94\x5d\xc0"""
 
+def raises_unicode_encode_error_on_python_2(f):
+    if sys.version_info.major >= 3:
+        return f
+    @functools.wraps(f)
+    def decorated(self, *args, **kwargs):
+        with self.assertRaises(UnicodeEncodeError):
+            return f(self, *args, **kwargs)
+    return decorated
+
 
 class TestARC4(unittest.TestCase):
     def test_init_with_zero_length_key_raises_error(self):
@@ -46,11 +59,46 @@ class TestARC4(unittest.TestCase):
             arc4.ARC4(b'')
             self.assertEqual('invalid key length: 0', e.message)
 
-    def test_encrypt(self):
+    def test_init_with_bytes_returns_instance(self):
+        self.assertIsInstance(arc4.ARC4(b'spam'), arc4.ARC4)
+
+    @raises_unicode_encode_error_on_python_2
+    def test_init_with_unicode_returns_instance(self):
+        self.assertIsInstance(arc4.ARC4(u'スパム'), arc4.ARC4)
+
+    def test_init_with_bytearray_raises_type_error(self):
+        with self.assertRaises(TypeError):
+            arc4.ARC4(bytearray([0x66, 0x6f, 0x6f]))
+
+    def test_init_with_memoryview_raises_type_error(self):
+        with self.assertRaises(TypeError):
+            arc4.ARC4(memoryview(b'spam'))
+
+    def test_encrypt_with_long_bytes_returns_encrypted_bytes(self):
         cipher = arc4.ARC4(KEY)
         self.assertEqual(LOREM_ARC4, cipher.encrypt(LOREM))
 
-    def test_decrypt(self):
+    @raises_unicode_encode_error_on_python_2
+    def test_encrypt_with_unicode_returns_encrypted_bytes(self):
+        cipher = arc4.ARC4(b'spam')
+        self.assertEqual(b'Q\xcd\xb1!\xecg', cipher.encrypt(u'ハム'))
+
+    def test_encrypt_with_bytearray_raises_type_error(self):
+        cipher = arc4.ARC4(b'spam')
+        with self.assertRaises(TypeError):
+            cipher.encrypt(bytearray(b'ham'))
+
+    def test_encrypt_with_memoryview_raises_type_error(self):
+        cipher = arc4.ARC4(b'spam')
+        with self.assertRaises(TypeError):
+            cipher.encrypt(memoryview(b'ham'))
+
+    def test_encrypt_with_list_raises_type_error(self):
+        cipher = arc4.ARC4(b'spam')
+        with self.assertRaises(TypeError):
+            cipher.encrypt([0x68, 0x61, 0x6d])
+
+    def test_decrypt_with_long_bytes_returns_decrypted_bytes(self):
         cipher = arc4.ARC4(KEY)
         self.assertEqual(LOREM, cipher.decrypt(LOREM_ARC4))
 
