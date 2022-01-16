@@ -11,16 +11,17 @@ jobs:
         - macOS-latest
         - windows-latest
         python-version:
-        - 2.7
-        - 3.5
-        - 3.6
-        - 3.7
-        - 3.8
-        - 3.9
+        - '2.7'
+        - '3.5'
+        - '3.6'
+        - '3.7'
+        - '3.8'
+        - '3.9'
+        - '3.10'
         exclude:
         # Needs missing Visual C++ 9.0
         - os: windows-latest
-          python-version: 2.7
+          python-version: '2.7'
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
@@ -43,6 +44,7 @@ jobs:
         - cp37-cp37m
         - cp38-cp38
         - cp39-cp39
+        - cp310-cp310
     steps:
     - uses: actions/checkout@v2
     - run: /opt/python/${{ matrix.python-version }}/bin/pip wheel .
