@@ -1,0 +1,11 @@
+---
+name: Lint
+on:
+- push
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: clang-format
+      run: clang-format --Werror --dry-run arc4.c
