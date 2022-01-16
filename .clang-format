@@ -13,5 +13,6 @@ PointerAlignment: Right
 ReflowComments: true
 SpaceBeforeParens: ControlStatements
 SpacesInParentheses: false
+StatementMacros: [PyObject_HEAD]
 TabWidth: 4
 UseTab: Never

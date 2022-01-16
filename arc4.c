@@ -50,7 +50,8 @@ arc4_crypt(struct arc4_state *state, unsigned char *buffer,
 }
 
 struct arc4_ARC4 {
-    PyObject_HEAD struct arc4_state state;
+    PyObject_HEAD
+    struct arc4_state state;
 };
 
 static int
@@ -170,7 +171,8 @@ PyDoc_STRVAR(arc4_ARC4Type_doc,
              "operations.\n");
 
 static PyTypeObject arc4_ARC4Type = {
-    PyVarObject_HEAD_INIT(NULL, 0) "arc4.ARC4",
+    PyVarObject_HEAD_INIT(NULL, 0) /* A trailing comma is included */
+    "arc4.ARC4",
     sizeof(struct arc4_ARC4),
     0,                        /* tp_itemsize */
     0,                        /* tp_dealloc */
