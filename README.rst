@@ -29,6 +29,8 @@ Below is benchmark metrics against 3 major RC4 implementations.
 .. table:: Encrypt 1,024KB * 400 times
 
 ================================================= =========== ===========
+                     Library                        1 thread   4 threads
+================================================= =========== ===========
 `arc4 <https://pypi.org/project/arc4/>`_            0.803 sec   0.589 sec
 `PyCrypto <https://pypi.org/project/pycrypto/>`_    1.861 sec   0.858 sec
 `rc4 <https://pypi.org/project/rc4/>`_            210.643 sec 213.000 sec
