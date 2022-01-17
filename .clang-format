@@ -9,6 +9,8 @@ ColumnLimit: 79
 DerivePointerAlignment: false
 IndentWidth: 4
 Language: Cpp
+MacroBlockBegin: Py_BEGIN_ALLOW_THREADS
+MacroBlockEnd: Py_END_ALLOW_THREADS
 PointerAlignment: Right
 ReflowComments: true
 SpaceBeforeParens: ControlStatements

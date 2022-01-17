@@ -67,7 +67,9 @@ arc4_ARC4_init(struct arc4_ARC4 *self, PyObject *args, PyObject *kwargs)
         PyErr_Format(PyExc_ValueError, "invalid key length: %zd", key_size);
         return -1;
     }
-    arc4_init(&(self->state), (const unsigned char *)key, key_size);
+    Py_BEGIN_ALLOW_THREADS
+        arc4_init(&(self->state), (const unsigned char *)key, key_size);
+    Py_END_ALLOW_THREADS
     return 0;
 }
 
@@ -83,8 +85,11 @@ arc4_ARC4_crypt(struct arc4_ARC4 *self, PyObject *args)
         return NULL;
     }
     copied_buffer = PyMem_Malloc(sizeof(char) * buffer_size);
-    memcpy(copied_buffer, buffer, buffer_size);
-    arc4_crypt(&(self->state), (unsigned char *)copied_buffer, buffer_size);
+    Py_BEGIN_ALLOW_THREADS
+        memcpy(copied_buffer, buffer, buffer_size);
+        arc4_crypt(&(self->state), (unsigned char *)copied_buffer,
+                   buffer_size);
+    Py_END_ALLOW_THREADS
     bytes =
         PyBytes_FromStringAndSize((const char *)copied_buffer, buffer_size);
     PyMem_Free(copied_buffer);
