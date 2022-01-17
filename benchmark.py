@@ -1,41 +1,109 @@
-from __future__ import unicode_literals
+from __future__ import division
 
-from string import ascii_letters
-from timeit import timeit
-from random import choice
+import gc
+import multiprocessing
+import string
+import threading
+import timeit
+import sys
 
-from matplotlib.ticker import FormatStrFormatter, AutoMinorLocator
+import Crypto.Cipher.ARC4
+import arc4
+import matplotlib
+import rc4
+
+
+if sys.version_info.major <= 2:
+    matplotlib.use('TKAgg')
+
 import matplotlib.pyplot as plt
 
-BYTES = ''.join(choice(ascii_letters) for _ in range(1024))
-NUMBER = 50000
+
+TEXT = 'x' * 1024 * 1024
+NCPU = multiprocessing.cpu_count()
+N = NCPU * 100
 
 
-def export_graph(path, labels, values, style):
-    with plt.style.context(style):
+def save_graph_image(path, labels, single_thread_values, multi_thread_values, kilobytes, iterations):
+    width = 0.35
+    xs = range(len(labels))
+    with plt.style.context('bmh'):
         fig, ax = plt.subplots()
-        ax.set_title('Seconds for decrypting 1KB * {:,} times (lower is better)'.format(NUMBER))
+        single_thread_rects = ax.bar([x - width / 2 for x in xs], single_thread_values, width, label='1 thread')
+        multi_thread_rects = ax.bar([x + width / 2 for x in xs], multi_thread_values, width, label='{} threads'.format(NCPU))
+        ax.set_yscale('log')
         ax.set_ylabel('Seconds')
-        if style == 'bmh':
-            ax.xaxis.grid()
-        else:
-            ax.yaxis.grid()
-        ax.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-        ax.yaxis.set_minor_locator(AutoMinorLocator())
-        ax.bar(result.keys(), result.values())
-        for i, v in enumerate(result.values()):
-            ax.text(i - 0.1, v + 0.05, '{:.3} sec'.format(v))
-        fig.savefig(path)
+        ax.set_title('Encrypt {:,}KB * {:,} times'.format(kilobytes, iterations))
+        ax.set_xticks(xs)
+        ax.set_xticklabels(labels)
+        ax.legend()
+        autolabel(ax, single_thread_rects, single_thread_values)
+        autolabel(ax, multi_thread_rects, multi_thread_values)
+        fig.tight_layout()
+        fig.savefig(path, dpi=300)
+
+
+def autolabel(ax, rects, values):
+    """Attach a text label above each bar in *rects*, displaying its height."""
+    for rect, value in zip(rects, values):
+        ax.annotate('{:.3f}'.format(value),
+                    xy=(rect.get_x() + rect.get_width() / 2, value),
+                    xytext=(0, 3), # 3 points vertical offset
+                    textcoords='offset points',
+                    ha='center',
+                    va='bottom')
+
+
+def benchmark(target, iterations, thread_count, timer=timeit.default_timer):
+    assert 1 <= thread_count <= iterations
+    result = 0
+    if thread_count == 1:
+        for _ in range(iterations):
+            gc.disable()
+            start = timer()
+            target()
+            result += timer() - start
+            gc.enable()
+    else:
+        for i in range(iterations // thread_count):
+            threads = [threading.Thread(target=target) for _ in range(thread_count)]
+            gc.disable()
+            start = timer()
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join()
+            result += timer() - start
+            gc.enable()
+    return result
+
+
+def arc4_code():
+    arc4.ARC4('key').encrypt(TEXT)
+
+
+def pycrypto_code():
+    Crypto.Cipher.ARC4.new('key').encrypt(TEXT)
+
+
+def rc4_code():
+    rc4.rc4(TEXT, 'key')
 
 
 if __name__ == '__main__':
-    result = {
-        'arc4': timeit('arc4.ARC4("key").encrypt("{}")'.format(BYTES),
-                       'import arc4', number=NUMBER),
-        'pycrypto': timeit('ARC4.new("key").encrypt("{}")'.format(BYTES),
-                           'import Crypto.Cipher.ARC4 as ARC4', number=NUMBER),
-        'rc4': timeit('rc4.rc4("key", "bytes")', 'import rc4', number=NUMBER)
-    }
-    for k, v in result.items():
-        print('{}: {}'.format(k, v))
-    export_graph('benchmark.png', result.keys(), result.values(), 'bmh')
+    labels = ['arc4', 'pycrypto', 'rc4']
+    single_thread_values = [
+        benchmark(arc4_code, N, 1),
+        benchmark(pycrypto_code, N, 1),
+        # rc4 is very slow so decrease N and multiply N to the result.
+        benchmark(rc4_code, NCPU, 1) * 100,
+    ]
+    multi_thread_values = [
+        benchmark(arc4_code, N, NCPU),
+        benchmark(pycrypto_code, N, NCPU),
+        benchmark(rc4_code, NCPU * 2, NCPU) * N // NCPU // 2,
+    ]
+    print('cpu_count: {}'.format(NCPU))
+    for label, single, multi in zip(labels, single_thread_values, multi_thread_values):
+        print('{}: {}, {}'.format(label, single, multi))
+    save_graph_image('benchmark.png', labels, single_thread_values, multi_thread_values, len(TEXT) // 1024, N)
