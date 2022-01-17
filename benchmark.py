@@ -3,9 +3,9 @@ from __future__ import division
 import gc
 import multiprocessing
 import string
+import sys
 import threading
 import timeit
-import sys
 
 import Crypto.Cipher.ARC4
 import arc4
