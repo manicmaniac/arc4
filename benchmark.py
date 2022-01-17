@@ -24,7 +24,7 @@ NCPU = multiprocessing.cpu_count()
 N = NCPU * 100
 
 
-def save_graph_image(path, labels, single_thread_values, multi_thread_values, kilobytes, iterations):
+def save_graph_image(path, labels, single_thread_values, multi_thread_values):
     width = 0.35
     xs = range(len(labels))
     with plt.style.context('bmh'):
@@ -33,7 +33,7 @@ def save_graph_image(path, labels, single_thread_values, multi_thread_values, ki
         multi_thread_rects = ax.bar([x + width / 2 for x in xs], multi_thread_values, width, label='{} threads'.format(NCPU))
         ax.set_yscale('log')
         ax.set_ylabel('Seconds')
-        ax.set_title('Encrypt {:,}KB * {:,} times'.format(kilobytes, iterations))
+        ax.set_title('Encrypt {:,}KB * {:,} times'.format(len(TEXT) // 1024, N))
         ax.set_xticks(xs)
         ax.set_xticklabels(labels)
         ax.legend()
@@ -58,23 +58,35 @@ def benchmark(target, iterations, thread_count, timer=timeit.default_timer):
     assert 1 <= thread_count <= iterations
     result = 0
     if thread_count == 1:
-        for _ in range(iterations):
-            gc.disable()
-            start = timer()
-            target()
-            result += timer() - start
-            gc.enable()
+        return _benchmark_single_thread(target, iterations, timer)
     else:
-        for i in range(iterations // thread_count):
-            threads = [threading.Thread(target=target) for _ in range(thread_count)]
-            gc.disable()
-            start = timer()
-            for thread in threads:
-                thread.start()
-            for thread in threads:
-                thread.join()
-            result += timer() - start
-            gc.enable()
+        return _benchmark_multi_thread(target, iterations, thread_count, timer)
+    return result
+
+
+def _benchmark_single_thread(target, iterations, timer):
+    result = 0
+    for _ in range(iterations):
+        gc.disable()
+        start = timer()
+        target()
+        result += timer() - start
+        gc.enable()
+    return result
+
+
+def _benchmark_multi_thread(target, iterations, thread_count, timer):
+    result = 0
+    for _ in range(iterations // thread_count):
+        threads = [threading.Thread(target=target) for _ in range(thread_count)]
+        gc.disable()
+        start = timer()
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+        result += timer() - start
+        gc.enable()
     return result
 
 
@@ -106,4 +118,4 @@ if __name__ == '__main__':
     print('cpu_count: {}'.format(NCPU))
     for label, single, multi in zip(labels, single_thread_values, multi_thread_values):
         print('{}: {}, {}'.format(label, single, multi))
-    save_graph_image('benchmark.png', labels, single_thread_values, multi_thread_values, len(TEXT) // 1024, N)
+    save_graph_image('benchmark.png', labels, single_thread_values, multi_thread_values)
