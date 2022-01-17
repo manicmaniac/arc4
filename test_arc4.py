@@ -102,6 +102,7 @@ class TestARC4(unittest.TestCase):
         with self.assertRaises(TypeError):
             cipher.encrypt([0x68, 0x61, 0x6d])
 
+    @unittest.skip('takes long time and a bit flaky depends on environment')
     @unittest.skipIf(multiprocessing.cpu_count() <= 1, 'needs multiple cores')
     def test_encrypt_thread_performance(self):
         large_text = 'a' * 10 * 1024 * 1024
