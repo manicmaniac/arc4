@@ -9,6 +9,10 @@ arc4
    :target: https://arc4.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
 
+.. image:: https://api.codeclimate.com/v1/badges/e7c21db66865a6d487d0/maintainability
+   :target: https://codeclimate.com/github/manicmaniac/arc4/maintainability
+   :alt: Maintainability
+
 A small and insanely fast ARCFOUR (RC4) cipher implementation of Python.
 
 * Strongly focused on performance; entire source code is written in C.
