@@ -4,7 +4,11 @@ from __future__ import unicode_literals
 
 import doctest
 import functools
+import multiprocessing
 import sys
+import textwrap
+import threading
+import timeit
 import unittest
 
 import arc4
@@ -97,6 +101,44 @@ class TestARC4(unittest.TestCase):
         cipher = arc4.ARC4(b'spam')
         with self.assertRaises(TypeError):
             cipher.encrypt([0x68, 0x61, 0x6d])
+
+    @unittest.skip('takes long time and a bit flaky depends on environment')
+    @unittest.skipIf(multiprocessing.cpu_count() <= 1, 'needs multiple cores')
+    def test_encrypt_thread_performance(self):
+        large_text = 'a' * 10 * 1024 * 1024
+        number = 100
+        cpu_count = multiprocessing.cpu_count()
+        setup = textwrap.dedent("""\
+            from arc4 import ARC4
+            from threading import Thread
+
+            def target():
+                ARC4({key!r}).encrypt({text!r})
+            """.format(key=KEY, text=large_text))
+        # Create unused threads to make the similar conditions
+        # between single and multiple threads.
+        code = textwrap.dedent("""\
+            threads = []
+            for i in range({}):
+                thread = Thread(target=target)
+                threads.append(thread)
+            for thread in threads:
+                pass
+            target()
+            """.format(cpu_count))
+        single_thread_elapsed_time = timeit.timeit(code, setup, number=number)
+        code = textwrap.dedent("""\
+            threads = []
+            for i in range({}):
+                thread = Thread(target=target)
+                threads.append(thread)
+                thread.start()
+            for thread in threads:
+                thread.join()
+            """.format(cpu_count))
+        multi_thread_elapsed_time = timeit.timeit(code, setup,
+                number=number // cpu_count)
+        self.assertLess(multi_thread_elapsed_time, single_thread_elapsed_time)
 
     def test_decrypt_with_long_bytes_returns_decrypted_bytes(self):
         cipher = arc4.ARC4(KEY)
