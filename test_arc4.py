@@ -107,36 +107,36 @@ class TestARC4(unittest.TestCase):
         large_text = 'a' * 10 * 1024 * 1024
         number = 100
         cpu_count = multiprocessing.cpu_count()
-        variables = {'KEY': KEY, 'ARC4': arc4.ARC4, 'large_text': large_text,
-                'Thread': threading.Thread}
         setup = textwrap.dedent("""\
-        def target():
-            ARC4(KEY).encrypt(large_text)
-        """)
+            from arc4 import ARC4
+            from threading import Thread
+
+            def target():
+                ARC4({key!r}).encrypt({text!r})
+            """.format(key=KEY, text=large_text))
         # Create unused threads to make the similar conditions
         # between single and multiple threads.
         code = textwrap.dedent("""\
-        threads = []
-        for i in range({}):
-            thread = Thread(target=target)
-            threads.append(thread)
-        for thread in threads:
-            pass
-        target()
-        """.format(cpu_count))
-        single_thread_elapsed_time = timeit.timeit(code, setup, number=number,
-                globals=variables)
+            threads = []
+            for i in range({}):
+                thread = Thread(target=target)
+                threads.append(thread)
+            for thread in threads:
+                pass
+            target()
+            """.format(cpu_count))
+        single_thread_elapsed_time = timeit.timeit(code, setup, number=number)
         code = textwrap.dedent("""\
-        threads = []
-        for i in range({}):
-            thread = Thread(target=target)
-            threads.append(thread)
-            thread.start()
-        for thread in threads:
-            thread.join()
-        """.format(cpu_count))
+            threads = []
+            for i in range({}):
+                thread = Thread(target=target)
+                threads.append(thread)
+                thread.start()
+            for thread in threads:
+                thread.join()
+            """.format(cpu_count))
         multi_thread_elapsed_time = timeit.timeit(code, setup,
-                number=number // cpu_count, globals=variables)
+                number=number // cpu_count)
         self.assertLess(multi_thread_elapsed_time, single_thread_elapsed_time)
 
     def test_decrypt_with_long_bytes_returns_decrypted_bytes(self):
