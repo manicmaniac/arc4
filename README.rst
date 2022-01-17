@@ -1,9 +1,9 @@
 arc4
 ====
 
-.. image:: https://travis-ci.org/manicmaniac/arc4.svg?branch=master
-   :target: https://travis-ci.org/manicmaniac/arc4
-   :alt: Build Status
+.. image:: https://github.com/manicmaniac/arc4/actions/workflows/test.yml/badge.svg
+   :target: https://github.com/manicmaniac/arc4/actions/workflows/test.yml
+   :alt: Test
 
 .. image:: https://readthedocs.org/projects/arc4/badge/?version=latest
    :target: https://arc4.readthedocs.io/en/latest/?badge=latest
