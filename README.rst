@@ -5,13 +5,17 @@ arc4
    :target: https://github.com/manicmaniac/arc4/actions/workflows/test.yml
    :alt: Test
 
+.. image:: https://api.codeclimate.com/v1/badges/e7c21db66865a6d487d0/test_coverage.svg
+   :target: https://codeclimate.com/github/manicmaniac/arc4/test_coverage
+   :alt: Test Coverage
+
+.. image:: https://api.codeclimate.com/v1/badges/e7c21db66865a6d487d0/maintainability.svg
+   :target: https://codeclimate.com/github/manicmaniac/arc4/maintainability
+   :alt: Maintainability
+
 .. image:: https://readthedocs.org/projects/arc4/badge/?version=latest
    :target: https://arc4.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
-
-.. image:: https://api.codeclimate.com/v1/badges/e7c21db66865a6d487d0/maintainability
-   :target: https://codeclimate.com/github/manicmaniac/arc4/maintainability
-   :alt: Maintainability
 
 A small and insanely fast ARCFOUR (RC4) cipher implementation of Python.
 
