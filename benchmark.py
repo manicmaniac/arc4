@@ -2,7 +2,6 @@ from __future__ import division
 
 import gc
 import multiprocessing
-import string
 import sys
 import threading
 import timeit
@@ -29,11 +28,18 @@ def save_graph_image(path, labels, single_thread_values, multi_thread_values):
     xs = range(len(labels))
     with plt.style.context('bmh'):
         fig, ax = plt.subplots()
-        single_thread_rects = ax.bar([x - width / 2 for x in xs], single_thread_values, width, label='1 thread')
-        multi_thread_rects = ax.bar([x + width / 2 for x in xs], multi_thread_values, width, label='{} threads'.format(NCPU))
+        single_thread_rects = ax.bar([x - width / 2 for x in xs],
+                                     single_thread_values,
+                                     width,
+                                     label='1 thread')
+        multi_thread_rects = ax.bar([x + width / 2 for x in xs],
+                                    multi_thread_values,
+                                    width,
+                                    label='{} threads'.format(NCPU))
         ax.set_yscale('log')
         ax.set_ylabel('Seconds')
-        ax.set_title('Encrypt {:,}KB * {:,} times'.format(len(TEXT) // 1024, N))
+        kilobytes = len(TEXT) // 1024
+        ax.set_title('Encrypt {:,}KB * {:,} times'.format(kilobytes, N))
         ax.set_xticks(xs)
         ax.set_xticklabels(labels)
         ax.legend()
@@ -48,7 +54,7 @@ def autolabel(ax, rects, values):
     for rect, value in zip(rects, values):
         ax.annotate('{:.3f}'.format(value),
                     xy=(rect.get_x() + rect.get_width() / 2, value),
-                    xytext=(0, 3), # 3 points vertical offset
+                    xytext=(0, 3),  # 3 points vertical offset
                     textcoords='offset points',
                     ha='center',
                     va='bottom')
@@ -78,7 +84,8 @@ def _benchmark_single_thread(target, iterations, timer):
 def _benchmark_multi_thread(target, iterations, thread_count, timer):
     result = 0
     for _ in range(iterations // thread_count):
-        threads = [threading.Thread(target=target) for _ in range(thread_count)]
+        threads = [threading.Thread(target=target)
+                   for _ in range(thread_count)]
         gc.disable()
         start = timer()
         for thread in threads:
@@ -116,6 +123,8 @@ if __name__ == '__main__':
         benchmark(rc4_code, NCPU * 2, NCPU) * N // NCPU // 2,
     ]
     print('cpu_count: {}'.format(NCPU))
-    for label, single, multi in zip(labels, single_thread_values, multi_thread_values):
+    result = zip(labels, single_thread_values, multi_thread_values)
+    for label, single, multi in result:
         print('{}: {}, {}'.format(label, single, multi))
-    save_graph_image('benchmark.png', labels, single_thread_values, multi_thread_values)
+    save_graph_image('benchmark.png', labels, single_thread_values,
+                     multi_thread_values)
