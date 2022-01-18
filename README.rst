@@ -32,24 +32,28 @@ Below is benchmark metrics against 3 major RC4 implementations.
 
 .. table:: Encrypt 1,024KB * 400 times
 
-================================================= =========== ===========
-                     Library                        1 thread   4 threads
-================================================= =========== ===========
-`arc4 <https://pypi.org/project/arc4/>`_            0.803 sec   0.589 sec
-`PyCrypto <https://pypi.org/project/pycrypto/>`_    1.861 sec   0.858 sec
-`rc4 <https://pypi.org/project/rc4/>`_            210.643 sec 213.000 sec
-================================================= =========== ===========
+    ================================================= =========== ===========
+                        Library                        1 thread   4 threads
+    ================================================= =========== ===========
+    `arc4 <https://pypi.org/project/arc4/>`_            0.803 sec   0.589 sec
+    `PyCrypto <https://pypi.org/project/pycrypto/>`_    1.861 sec   0.858 sec
+    `rc4 <https://pypi.org/project/rc4/>`_            210.643 sec 213.000 sec
+    ================================================= =========== ===========
 
 The whole benchmark code is in ``./benchmark.py``.
 
 Install
 -------
 
-Install from PyPI::
+Install from PyPI
+
+.. code:: sh
 
    pip install arc4
 
-Or clone the repo and do install::
+Or clone the repo and do install
+
+.. code:: sh
 
    git clone https://github.com/manicmaniac/arc4.git
    cd arc4
@@ -82,7 +86,7 @@ https://arc4.readthedocs.io/en/latest/
 Testing
 -------
 
-.. code:: python
+.. code:: sh
 
    python -m unittest discover
 
