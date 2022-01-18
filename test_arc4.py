@@ -7,7 +7,6 @@ import functools
 import multiprocessing
 import sys
 import textwrap
-import threading
 import timeit
 import unittest
 
@@ -19,8 +18,9 @@ LOREM = b"""Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do \
 eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim \
 veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea \
 commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit \
-esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat \
-non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."""
+esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat \
+cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est \
+laborum."""
 
 LOREM_ARC4 = b"""\xf0\xa8\x59\xec\xdf\x9d\xbd\x95\x52\x91\x66\x72\x50\x01\x0d\
 \x3a\xac\x62\x10\xdc\x58\x0f\x49\x02\xd9\x45\x2a\xad\x3a\x2b\x79\xd5\x2b\x29\
@@ -47,9 +47,11 @@ LOREM_ARC4 = b"""\xf0\xa8\x59\xec\xdf\x9d\xbd\x95\x52\x91\x66\x72\x50\x01\x0d\
 \x88\x2c\x21\x74\xed\xa3\x5c\x7c\xa7\x03\x42\x4d\x21\x50\xe2\x9b\x2b\x99\x88\
 \x1e\xd4\x53\xda\x1c\xa2\xc7\x5b\xb5\x94\x5d\xc0"""
 
+
 def raises_unicode_encode_error_on_python_2(f):
     if sys.version_info.major >= 3:
         return f
+
     @functools.wraps(f)
     def decorated(self, *args, **kwargs):
         with self.assertRaises(UnicodeEncodeError):
@@ -137,7 +139,7 @@ class TestARC4(unittest.TestCase):
                 thread.join()
             """.format(cpu_count))
         multi_thread_elapsed_time = timeit.timeit(code, setup,
-                number=number // cpu_count)
+                                                  number=number // cpu_count)
         self.assertLess(multi_thread_elapsed_time, single_thread_elapsed_time)
 
     def test_decrypt_with_long_bytes_returns_decrypted_bytes(self):
