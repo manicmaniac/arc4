@@ -3,8 +3,8 @@ name: Test
 on:
 - push
 jobs:
-  unit-test:
-    runs-on: ubuntu-latest
+  test:
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
@@ -28,5 +28,36 @@ jobs:
     - uses: actions/setup-python@v2
       with:
         python-version: "${{ matrix.python-version }}"
-    - run: pip install tox
-    - run: tox -e ${{ matrix.tox-env }}
+    - name: Install cc-test-reporter
+      run: |
+        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+        chmod +x ./cc-test-reporter
+    - run: ./cc-test-reporter before-build
+    - run: python setup.py build_ext --inplace
+      env:
+        CFLAGS: --coverage
+    - run: python -m unittest discover --verbose
+    - name: Format coverage
+      run: |
+        gcov -o build/temp.* arc4.c
+        rm -f *.h.gcov
+        ./cc-test-reporter format-coverage --input-type gcov --output 'coverage.${{ matrix.python-version }}.xml' .
+    - uses: actions/upload-artifact@v2
+      with:
+        name: coverages
+        path: coverage.${{ matrix.python-version }}.xml
+  upload-coverage:
+    runs-on: ubuntu-20.04
+    needs: test
+    steps:
+    - uses: actions/download-artifact@v2
+      with:
+        name: coverages
+    - name: Install cc-test-reporter
+      run: |
+        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+        chmod +x ./cc-test-reporter
+    - name: Upload coverage
+      run: ./cc-test-reporter sum-coverage --output - coverage.*.xml | ./cc-test-reporter upload-coverage --debug --input -
+      env:
+        CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
