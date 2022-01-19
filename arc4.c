@@ -27,8 +27,8 @@ arc4_init(struct arc4_state *state, const unsigned char *key,
 }
 
 static void
-arc4_crypt(struct arc4_state *state, unsigned char *buffer,
-           Py_ssize_t buffer_size)
+arc4_crypt(struct arc4_state *state, const unsigned char *input,
+           unsigned char *output, Py_ssize_t size)
 {
     unsigned char x, y, *s, sx, sy;
     Py_ssize_t i;
@@ -36,14 +36,14 @@ arc4_crypt(struct arc4_state *state, unsigned char *buffer,
     x = state->x;
     y = state->y;
     s = state->s;
-    for (i = 0; i < buffer_size; i++) {
+    for (i = 0; i < size; i++) {
         x++;
         y += s[x];
         sx = s[x];
         sy = s[y];
         s[x] = sy;
         s[y] = sx;
-        buffer[i] ^= s[(sx + sy) & 0xFF];
+        output[i] = input[i] ^ s[(sx + sy) & 0xFF];
     }
     state->x = x;
     state->y = y;
@@ -76,19 +76,19 @@ arc4_ARC4_init(struct arc4_ARC4 *self, PyObject *args, PyObject *kwargs)
 static PyObject *
 arc4_ARC4_crypt(struct arc4_ARC4 *self, PyObject *args)
 {
-    const char *buffer = NULL;
-    char *copied_buffer = NULL;
-    Py_ssize_t buffer_size = 0;
+    const char *input = NULL;
+    char *output = NULL;
+    Py_ssize_t size = 0;
     PyObject *bytes = NULL;
 
-    if (!PyArg_ParseTuple(args, "s#:crypt", &buffer, &buffer_size)) {
+    if (!PyArg_ParseTuple(args, "s#:crypt", &input, &size)) {
         return NULL;
     }
-    bytes = PyBytes_FromStringAndSize(buffer, buffer_size);
-    copied_buffer = PyBytes_AS_STRING(bytes);
+    bytes = PyBytes_FromStringAndSize(NULL, size);
+    output = PyBytes_AS_STRING(bytes);
     Py_BEGIN_ALLOW_THREADS
-        arc4_crypt(&(self->state), (unsigned char *)copied_buffer,
-                   buffer_size);
+        arc4_crypt(&(self->state), (const unsigned char *)input,
+                   (unsigned char *)output, size);
     Py_END_ALLOW_THREADS
     return bytes;
 }
