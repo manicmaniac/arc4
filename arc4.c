@@ -84,15 +84,12 @@ arc4_ARC4_crypt(struct arc4_ARC4 *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "s#:crypt", &buffer, &buffer_size)) {
         return NULL;
     }
-    copied_buffer = PyMem_Malloc(sizeof(char) * buffer_size);
+    bytes = PyBytes_FromStringAndSize(buffer, buffer_size);
+    copied_buffer = PyBytes_AS_STRING(bytes);
     Py_BEGIN_ALLOW_THREADS
-        memcpy(copied_buffer, buffer, buffer_size);
         arc4_crypt(&(self->state), (unsigned char *)copied_buffer,
                    buffer_size);
     Py_END_ALLOW_THREADS
-    bytes =
-        PyBytes_FromStringAndSize((const char *)copied_buffer, buffer_size);
-    PyMem_Free(copied_buffer);
     return bytes;
 }
 
