@@ -10,7 +10,7 @@ jobs:
       with:
         python-version: '3.9'
     - run: pip install . matplotlib pycrypto rc4
-    - run: python benchmark.py
+    - run: nice -19 python benchmark.py
     - uses: actions/upload-artifact@v2
       with:
         name: benchmark
