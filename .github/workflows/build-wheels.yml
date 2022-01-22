@@ -18,10 +18,15 @@ jobs:
         - '3.8'
         - '3.9'
         - '3.10'
+        - 'pypy-2.7'
+        - 'pypy-3.7'
+        - 'pypy-3.8'
         exclude:
         # Needs missing Visual C++ 9.0
         - os: windows-latest
           python-version: '2.7'
+        - os: windows-latest
+          python-version: 'pypy-2.7'
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
@@ -45,6 +50,8 @@ jobs:
         - cp38-cp38
         - cp39-cp39
         - cp310-cp310
+        - pp37-pypy37_pp73
+        - pp38-pypy38_pp73
     steps:
     - uses: actions/checkout@v2
     - run: /opt/python/${{ matrix.python-version }}/bin/pip wheel .

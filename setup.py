@@ -20,11 +20,10 @@ setup(
     author_email='rito.0305@gmail.com',
     url='https://github.com/manicmaniac/arc4',
     ext_modules=[
-        Extension('arc4', sources=['arc4.c'], extra_compile_args=['-O3'])
+        Extension('arc4', sources=['arc4.c'])
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
-        'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 2.7',
@@ -33,7 +32,9 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: Implementation :: CPython',
+        'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Security :: Cryptography',
     ],
 )
