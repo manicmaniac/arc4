@@ -71,6 +71,21 @@ arc4_ARC4_init(struct arc4_ARC4 *self, PyObject *args, PyObject *kwargs)
     if (!PyArg_ParseTuple(args, "s#", &key, &key_size)) {
         return -1;
     }
+#ifdef PYPY_VERSION
+    /* PyPy's PyArg_ParseTuple(_, "s#", _, _) treats bytearray and memoryview
+     * as byte-like object.
+     * This behavior looks intended as document says:
+     * > a few corner cases don’t raise the same exception
+     * https://doc.pypy.org/en/latest/cpython_differences.html#miscellaneous
+     */
+    args = PyTuple_GET_ITEM(args, 0);
+    if (!(PyBytes_Check(args) || PyUnicode_Check(args))) {
+        PyErr_Format(PyExc_TypeError,
+                     "argument 1 must be read-only bytes-like object, not %s",
+                     args->ob_type->tp_name);
+        return -1;
+    }
+#endif
     if (key_size <= 0) {
         PyErr_Format(PyExc_ValueError, "invalid key length: %zd", key_size);
         return -1;
