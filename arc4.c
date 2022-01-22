@@ -1,6 +1,14 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
+#ifndef __restrict
+#if __STDC_VERSION__ >= 199901L
+#define __restrict restrict
+#else
+#define __restrict
+#endif /* __STDC_VERSION >= 199901L */
+#endif /* __restrict */
+
 struct arc4_state {
     unsigned char x, y, s[256];
 };
@@ -27,8 +35,8 @@ arc4_init(struct arc4_state *state, const unsigned char *key,
 }
 
 static void
-arc4_crypt(struct arc4_state *state, unsigned char *buffer,
-           Py_ssize_t buffer_size)
+arc4_crypt(struct arc4_state *state, const unsigned char *__restrict input,
+           unsigned char *__restrict output, Py_ssize_t size)
 {
     unsigned char x, y, *s, sx, sy;
     Py_ssize_t i;
@@ -36,14 +44,14 @@ arc4_crypt(struct arc4_state *state, unsigned char *buffer,
     x = state->x;
     y = state->y;
     s = state->s;
-    for (i = 0; i < buffer_size; i++) {
+    for (i = 0; i < size; i++) {
         x++;
         y += s[x];
         sx = s[x];
         sy = s[y];
         s[x] = sy;
         s[y] = sx;
-        buffer[i] ^= s[(sx + sy) & 0xFF];
+        output[i] = input[i] ^ s[(sx + sy) & 0xFF];
     }
     state->x = x;
     state->y = y;
@@ -73,27 +81,67 @@ arc4_ARC4_init(struct arc4_ARC4 *self, PyObject *args, PyObject *kwargs)
     return 0;
 }
 
-static PyObject *
-arc4_ARC4_crypt(struct arc4_ARC4 *self, PyObject *args)
+static int
+byteslike_as_string_and_size(PyObject *obj, char **buffer, Py_ssize_t *size)
 {
-    const char *buffer = NULL;
-    char *copied_buffer = NULL;
-    Py_ssize_t buffer_size = 0;
-    PyObject *bytes = NULL;
+#if PY_MAJOR_VERSION >= 3
+    const char *utf8;
+#else
+    PyObject *ascii;
+#endif
 
-    if (!PyArg_ParseTuple(args, "s#:crypt", &buffer, &buffer_size)) {
+    if (PyBytes_Check(obj)) {
+        *buffer = PyBytes_AS_STRING(obj);
+        *size = PyBytes_GET_SIZE(obj);
+        return 0;
+    }
+    if (PyUnicode_Check(obj)) {
+#if PY_MAJOR_VERSION >= 3
+        utf8 = (char *)PyUnicode_AsUTF8AndSize(obj, size);
+        if (utf8 != NULL) {
+            *buffer = (char *)utf8;
+            return 0;
+        }
+#else
+        ascii = PyUnicode_AsASCIIString(obj);
+        if (ascii != NULL) {
+            *buffer = PyBytes_AS_STRING(ascii);
+            *size = PyBytes_GET_SIZE(ascii);
+            Py_DECREF(ascii);
+            return 0;
+        }
+#endif
+    }
+    return -1;
+}
+
+static PyObject *
+arc4_ARC4_crypt(struct arc4_ARC4 *self, PyObject *arg)
+{
+    const char *input = NULL;
+    char *output = NULL;
+    Py_ssize_t size = 0;
+    PyObject *outputBytes = NULL;
+
+    if (arg == NULL) {
         return NULL;
     }
-    copied_buffer = PyMem_Malloc(sizeof(char) * buffer_size);
+    if (byteslike_as_string_and_size(arg, (char **)&input, &size) == -1) {
+        if (PyErr_Occurred() == NULL) {
+            PyErr_Format(PyExc_TypeError,
+                         "crypt() argument 1 must be read-only bytes-like "
+                         "object, not %s",
+                         arg->ob_type->tp_name);
+        }
+        return NULL;
+    }
+    outputBytes = PyBytes_FromStringAndSize(NULL, size);
+    output = PyBytes_AS_STRING(outputBytes);
     Py_BEGIN_ALLOW_THREADS
-        memcpy(copied_buffer, buffer, buffer_size);
-        arc4_crypt(&(self->state), (unsigned char *)copied_buffer,
-                   buffer_size);
+        arc4_crypt(&(self->state), (const unsigned char *)input,
+                   (unsigned char *)output, size);
     Py_END_ALLOW_THREADS
-    bytes =
-        PyBytes_FromStringAndSize((const char *)copied_buffer, buffer_size);
-    PyMem_Free(copied_buffer);
-    return bytes;
+    return outputBytes;
 }
 
 PyDoc_STRVAR(arc4_ARC4_decrypt_doc,
@@ -149,10 +197,8 @@ PyDoc_STRVAR(arc4_ARC4_encrypt_doc,
              "b'\\xda/S'\n");
 
 static PyMethodDef arc4_ARC4_methods[] = {
-    {"decrypt", (PyCFunction)arc4_ARC4_crypt, METH_VARARGS,
-     arc4_ARC4_decrypt_doc},
-    {"encrypt", (PyCFunction)arc4_ARC4_crypt, METH_VARARGS,
-     arc4_ARC4_encrypt_doc},
+    {"decrypt", (PyCFunction)arc4_ARC4_crypt, METH_O, arc4_ARC4_decrypt_doc},
+    {"encrypt", (PyCFunction)arc4_ARC4_crypt, METH_O, arc4_ARC4_encrypt_doc},
     {NULL}};
 
 PyDoc_STRVAR(arc4_ARC4Type_doc,

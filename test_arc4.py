@@ -60,10 +60,13 @@ def raises_unicode_encode_error_on_python_2(f):
 
 
 class TestARC4(unittest.TestCase):
+    # assertRaisesRegexp is renamed to assertRaisesRegex since Python 3.2.
+    if not hasattr(unittest.TestCase, 'assertRaisesRegex'):
+        assertRaisesRegex = unittest.TestCase.assertRaisesRegexp
+
     def test_init_with_zero_length_key_raises_error(self):
-        with self.assertRaises(ValueError) as e:
+        with self.assertRaisesRegex(ValueError, r'^invalid key length: 0$'):
             arc4.ARC4(b'')
-            self.assertEqual('invalid key length: 0', e.message)
 
     def test_init_with_bytes_returns_instance(self):
         self.assertIsInstance(arc4.ARC4(b'spam'), arc4.ARC4)
@@ -72,12 +75,24 @@ class TestARC4(unittest.TestCase):
     def test_init_with_unicode_returns_instance(self):
         self.assertIsInstance(arc4.ARC4(u'スパム'), arc4.ARC4)
 
+    @unittest.skipUnless(hasattr(__builtins__, 'buffer'),
+                         'buffer only exists in Python 2')
+    def test_init_with_buffer_raises_type_error(self):
+        with self.assertRaisesRegex(
+                TypeError,
+                r'argumentt 1 must be .*, not buffer'):
+            arc4.ARC4(buffer('spam'))  # noqa
+
     def test_init_with_bytearray_raises_type_error(self):
-        with self.assertRaises(TypeError):
+        with self.assertRaisesRegex(
+                TypeError,
+                r'argument 1 must be .*, not bytearray'):
             arc4.ARC4(bytearray([0x66, 0x6f, 0x6f]))
 
     def test_init_with_memoryview_raises_type_error(self):
-        with self.assertRaises(TypeError):
+        with self.assertRaisesRegex(
+                TypeError,
+                r'^argument 1 must be .*, not memoryview$'):
             arc4.ARC4(memoryview(b'spam'))
 
     def test_encrypt_with_long_bytes_returns_encrypted_bytes(self):
@@ -89,19 +104,37 @@ class TestARC4(unittest.TestCase):
         cipher = arc4.ARC4(b'spam')
         self.assertEqual(b'Q\xcd\xb1!\xecg', cipher.encrypt(u'ハム'))
 
+    @unittest.skipUnless(hasattr(__builtins__, 'buffer'),
+                         'buffer only exists in Python 2')
+    def test_encrypt_with_buffer_raises_type_error(self):
+        cipher = arc4.ARC4(b'spam')
+        with self.assertRaisesRegex(
+                TypeError,
+                r'^crypt\(\) argument 1 must be .*, not buffer$'):
+            cipher.encrypt(buffer(b'ham'))  # noqa
+
     def test_encrypt_with_bytearray_raises_type_error(self):
         cipher = arc4.ARC4(b'spam')
-        with self.assertRaises(TypeError):
+        with self.assertRaisesRegex(
+                TypeError,
+                r'^crypt\(\) argument 1 must be .*, not bytearray$'):
             cipher.encrypt(bytearray(b'ham'))
 
     def test_encrypt_with_memoryview_raises_type_error(self):
         cipher = arc4.ARC4(b'spam')
-        with self.assertRaises(TypeError):
+        with self.assertRaisesRegex(
+                TypeError,
+                r'^crypt\(\) argument 1 must be .*, not memoryview$'):
             cipher.encrypt(memoryview(b'ham'))
 
     def test_encrypt_with_list_raises_type_error(self):
         cipher = arc4.ARC4(b'spam')
-        with self.assertRaises(TypeError):
+        if sys.version_info.major >= 3:
+            message = r"^a bytes-like object is required, not 'list'"
+        else:
+            message = r'^\crypt\(\) argument 1 must be .*, not list'
+        message = r''
+        with self.assertRaisesRegex(TypeError, message):
             cipher.encrypt([0x68, 0x61, 0x6d])
 
     @unittest.skip('takes long time and a bit flaky depends on environment')
