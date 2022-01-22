@@ -80,7 +80,7 @@ class TestARC4(unittest.TestCase):
     def test_init_with_buffer_raises_type_error(self):
         with self.assertRaisesRegex(
                 TypeError,
-                r'argumentt 1 must be .*, not buffer'):
+                r'argument 1 must be .*, not buffer'):
             arc4.ARC4(buffer('spam'))  # noqa
 
     def test_init_with_bytearray_raises_type_error(self):
