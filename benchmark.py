@@ -126,5 +126,5 @@ if __name__ == '__main__':
     result = zip(labels, single_thread_values, multi_thread_values)
     for label, single, multi in result:
         print('{}: {}, {}'.format(label, single, multi))
-    save_graph_image('benchmark.png', labels, single_thread_values,
+    save_graph_image('benchmark.svg', labels, single_thread_values,
                      multi_thread_values)
