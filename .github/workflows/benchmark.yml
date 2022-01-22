@@ -1,0 +1,17 @@
+---
+name: Benchmark
+on: workflow_dispatch
+jobs:
+  benchmark:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+    - run: pip install . matplotlib pycrypto rc4
+    - run: python benchmark.py
+    - uses: actions/upload-artifact@v2
+      with:
+        name: benchmark
+        path: benchmark.svg
