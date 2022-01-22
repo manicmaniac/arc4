@@ -1,6 +1,6 @@
 ---
 name: Benchmark
-on: workflow_dispatch
+on: push
 jobs:
   benchmark:
     runs-on: ubuntu-20.04
