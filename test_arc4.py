@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 import doctest
 import functools
 import multiprocessing
+import platform
 import sys
 import textwrap
 import timeit
@@ -90,9 +91,12 @@ class TestARC4(unittest.TestCase):
             arc4.ARC4(bytearray([0x66, 0x6f, 0x6f]))
 
     def test_init_with_memoryview_raises_type_error(self):
-        with self.assertRaisesRegex(
-                TypeError,
-                r'^argument 1 must be .*, not memoryview$'):
+        if (platform.python_implementation() == 'PyPy' and
+                sys.version_info.major <= 2):
+            pattern = r'^must be .*, not memoryview$'
+        else:
+            pattern = r'^argument 1 must be .*, not memoryview$'
+        with self.assertRaisesRegex(TypeError, pattern):
             arc4.ARC4(memoryview(b'spam'))
 
     def test_encrypt_with_long_bytes_returns_encrypted_bytes(self):
