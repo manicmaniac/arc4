@@ -27,18 +27,8 @@ Benchmark
 
 Below is benchmark metrics against 3 major RC4 implementations.
 
-.. image:: https://user-images.githubusercontent.com/1672393/150625441-cb0ae234-f910-4a20-8d1c-bd9826ac7885.png
-   :alt: Encrypt 1,024KB * 400 times
-
-.. table:: Encrypt 1,024KB * 400 times
-
-    ================================================= =========== ===========
-                        Library                        1 thread   4 threads
-    ================================================= =========== ===========
-    `arc4 <https://pypi.org/project/arc4/>`_            0.587 sec   0.423 sec
-    `PyCrypto <https://pypi.org/project/pycrypto/>`_    1.531 sec   0.860 sec
-    `rc4 <https://pypi.org/project/rc4/>`_            206.916 sec 209.000 sec
-    ================================================= =========== ===========
+.. image:: https://gist.githubusercontent.com/manicmaniac/991d0c197e1cb62eec81edec65363187/raw/benchmark.svg
+   :alt: Benchmark
 
 The whole benchmark code is in ``./benchmark.py``.
 
