@@ -9,11 +9,19 @@
 #endif /* __STDC_VERSION >= 199901L */
 #endif /* __restrict */
 
+#if __STDC_VERSION__ < 199901L
+#ifdef __inline__
+#define inline __inline__
+#else
+#define inline
+#endif /* __inline__ */
+#endif /* __STDC_VERSION__ < 199901L */
+
 struct arc4_state {
     unsigned char x, y, s[256];
 };
 
-static void
+static inline void
 arc4_init(struct arc4_state *state, const unsigned char *key,
           Py_ssize_t key_size)
 {
@@ -37,7 +45,7 @@ arc4_init(struct arc4_state *state, const unsigned char *key,
     }
 }
 
-static void
+static inline void
 arc4_crypt(struct arc4_state *state, const unsigned char *__restrict input,
            unsigned char *__restrict output, Py_ssize_t size)
 {
@@ -103,7 +111,7 @@ arc4_ARC4_init(struct arc4_ARC4 *self, PyObject *args, PyObject *kwargs)
     return 0;
 }
 
-static int
+static inline int
 byteslike_as_string_and_size(PyObject *obj, char **buffer, Py_ssize_t *size)
 {
 #if PY_MAJOR_VERSION >= 3
