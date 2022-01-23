@@ -1,6 +1,11 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
+/* "restrict" qualifier and "inline" function specifier were introduced in C99.
+ * See http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1124.pdf
+ *
+ * Major compilers have alternatives of these keywords available even in C89.
+ */
 #if __STDC_VERSION__ < 199901L
 #ifdef __restrict
 #define restrict __restrict
@@ -14,10 +19,13 @@
 #endif /* __inline__ */
 #endif /* __STDC_VERSION__ < 199901L */
 
+/* Backport of the convenience macro introduced in Python 3.5
+ * See https://github.com/python/cpython/blob/v3.5.0/Include/pymacro.h#L19
+ */
 #ifndef Py_STRINGIFY
 #define ARC4_XSTRINGIFY(x) #x
 #define Py_STRINGIFY(x) ARC4_XSTRINGIFY(x)
-#endif
+#endif /* Py_STRINGIFY */
 
 struct arc4_state {
     unsigned char x, y, s[256];
