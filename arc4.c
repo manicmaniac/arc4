@@ -108,6 +108,13 @@ arc4_ARC4_init(struct arc4_ARC4 *self, PyObject *args, PyObject *kwargs)
     return 0;
 }
 
+static void
+arc4_ARC4_dealloc(struct arc4_ARC4 *self)
+{
+    memset(&self->state, 0, sizeof(self->state));
+    Py_TYPE(self)->tp_free((PyObject *)self);
+}
+
 static inline int
 byteslike_as_string_and_size(PyObject *obj, char **buffer, Py_ssize_t *size)
 {
@@ -252,41 +259,41 @@ static PyTypeObject arc4_ARC4Type = {
     PyVarObject_HEAD_INIT(NULL, 0) /* A trailing comma is included */
     "arc4.ARC4",
     sizeof(struct arc4_ARC4),
-    0,                        /* tp_itemsize */
-    0,                        /* tp_dealloc */
-    0,                        /* tp_print */
-    0,                        /* tp_getattr */
-    0,                        /* tp_setattr */
-    0,                        /* tp_compare */
-    0,                        /* tp_repr */
-    0,                        /* tp_as_number */
-    0,                        /* tp_as_sequence */
-    0,                        /* tp_as_mapping */
-    0,                        /* tp_hash */
-    0,                        /* tp_call */
-    0,                        /* tp_str */
-    0,                        /* tp_getattro */
-    0,                        /* tp_setattro */
-    0,                        /* tp_as_buffer */
-    Py_TPFLAGS_DEFAULT,       /* tp_flags */
-    arc4_ARC4Type_doc,        /* tp_doc */
-    0,                        /* tp_traverse */
-    0,                        /* tp_clear */
-    0,                        /* tp_richcompare */
-    0,                        /* tp_weaklistoffset */
-    0,                        /* tp_iter */
-    0,                        /* tp_iternext */
-    arc4_ARC4_methods,        /* tp_methods */
-    0,                        /* tp_members */
-    0,                        /* tp_getset */
-    0,                        /* tp_base */
-    0,                        /* tp_dict */
-    0,                        /* tp_descr_get */
-    0,                        /* tp_descr_set */
-    0,                        /* tp_dictoffset */
-    (initproc)arc4_ARC4_init, /* tp_init */
-    0,                        /* tp_alloc */
-    PyType_GenericNew,        /* tp_new */
+    0,                             /* tp_itemsize */
+    (destructor)arc4_ARC4_dealloc, /* tp_dealloc */
+    0,                             /* tp_print */
+    0,                             /* tp_getattr */
+    0,                             /* tp_setattr */
+    0,                             /* tp_compare */
+    0,                             /* tp_repr */
+    0,                             /* tp_as_number */
+    0,                             /* tp_as_sequence */
+    0,                             /* tp_as_mapping */
+    0,                             /* tp_hash */
+    0,                             /* tp_call */
+    0,                             /* tp_str */
+    0,                             /* tp_getattro */
+    0,                             /* tp_setattro */
+    0,                             /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT,            /* tp_flags */
+    arc4_ARC4Type_doc,             /* tp_doc */
+    0,                             /* tp_traverse */
+    0,                             /* tp_clear */
+    0,                             /* tp_richcompare */
+    0,                             /* tp_weaklistoffset */
+    0,                             /* tp_iter */
+    0,                             /* tp_iternext */
+    arc4_ARC4_methods,             /* tp_methods */
+    0,                             /* tp_members */
+    0,                             /* tp_getset */
+    0,                             /* tp_base */
+    0,                             /* tp_dict */
+    0,                             /* tp_descr_get */
+    0,                             /* tp_descr_set */
+    0,                             /* tp_dictoffset */
+    (initproc)arc4_ARC4_init,      /* tp_init */
+    0,                             /* tp_alloc */
+    PyType_GenericNew,             /* tp_new */
 };
 
 #if PY_MAJOR_VERSION >= 3
