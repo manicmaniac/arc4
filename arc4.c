@@ -1,57 +1,69 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
-#ifndef __restrict
-#if __STDC_VERSION__ >= 199901L
-#define __restrict restrict
+#if __STDC_VERSION__ < 199901L
+#ifdef __restrict
+#define restrict __restrict
 #else
-#define __restrict
-#endif /* __STDC_VERSION >= 199901L */
+#define restrict
 #endif /* __restrict */
+#ifdef __inline__
+#define inline __inline__
+#else
+#define inline
+#endif /* __inline__ */
+#endif /* __STDC_VERSION__ < 199901L */
 
 struct arc4_state {
     unsigned char x, y, s[256];
 };
 
-static void
+static inline void
 arc4_init(struct arc4_state *state, const unsigned char *key,
           Py_ssize_t key_size)
 {
-    int i;
-    unsigned char j, k;
+    register int i;
 
     state->x = 0;
     state->y = 0;
     for (i = 0; i < 256; i++) {
         state->s[i] = (unsigned char)i;
     }
-    j = 0;
-    for (i = 0; i < 256; i++) {
-        j += state->s[i] + key[i % key_size];
-        k = state->s[i];
-        state->s[i] = state->s[j];
-        state->s[j] = k;
+    {
+        register unsigned char j, k;
+
+        j = 0;
+        for (i = 0; i < 256; i++) {
+            j += state->s[i] + key[i % key_size];
+            k = state->s[i];
+            state->s[i] = state->s[j];
+            state->s[j] = k;
+        }
     }
 }
 
-static void
-arc4_crypt(struct arc4_state *state, const unsigned char *__restrict input,
-           unsigned char *__restrict output, Py_ssize_t size)
+static inline void
+arc4_crypt(struct arc4_state *state, const unsigned char *restrict input,
+           unsigned char *restrict output, Py_ssize_t size)
 {
-    unsigned char x, y, *s, sx, sy;
-    Py_ssize_t i;
+    register unsigned char x, y, *s;
 
     x = state->x;
     y = state->y;
     s = state->s;
-    for (i = 0; i < size; i++) {
-        x++;
-        y += s[x];
-        sx = s[x];
-        sy = s[y];
-        s[x] = sy;
-        s[y] = sx;
-        output[i] = input[i] ^ s[(sx + sy) & 0xFF];
+    {
+        register unsigned char sx, sy;
+        register Py_ssize_t i;
+
+        for (i = 0; i < size; i++) {
+            x++;
+            y += s[x];
+            sx = s[x];
+            sy = s[y];
+            s[x] = sy;
+            s[y] = sx;
+            output[i] = input[i] ^ s[(sx + sy) & 0xFF];
+        }
     }
     state->x = x;
     state->y = y;
@@ -96,7 +108,7 @@ arc4_ARC4_init(struct arc4_ARC4 *self, PyObject *args, PyObject *kwargs)
     return 0;
 }
 
-static int
+static inline int
 byteslike_as_string_and_size(PyObject *obj, char **buffer, Py_ssize_t *size)
 {
 #if PY_MAJOR_VERSION >= 3
