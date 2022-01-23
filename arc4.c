@@ -1,15 +1,12 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
-#ifndef __restrict
-#if __STDC_VERSION__ >= 199901L
-#define __restrict restrict
-#else
-#define __restrict
-#endif /* __STDC_VERSION >= 199901L */
-#endif /* __restrict */
-
 #if __STDC_VERSION__ < 199901L
+#ifdef __restrict
+#define restrict __restrict
+#else
+#define restrict
+#endif /* __restrict */
 #ifdef __inline__
 #define inline __inline__
 #else
@@ -46,8 +43,8 @@ arc4_init(struct arc4_state *state, const unsigned char *key,
 }
 
 static inline void
-arc4_crypt(struct arc4_state *state, const unsigned char *__restrict input,
-           unsigned char *__restrict output, Py_ssize_t size)
+arc4_crypt(struct arc4_state *state, const unsigned char *restrict input,
+           unsigned char *restrict output, Py_ssize_t size)
 {
     register unsigned char x, y, *s;
 
