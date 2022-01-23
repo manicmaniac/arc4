@@ -13,6 +13,7 @@ import timeit
 import unittest
 
 import arc4
+import setup
 
 KEY = b'PYTHON3'
 
@@ -66,11 +67,14 @@ class TestARC4(unittest.TestCase):
     if not hasattr(unittest.TestCase, 'assertRaisesRegex'):
         assertRaisesRegex = unittest.TestCase.assertRaisesRegexp
 
-    def test_arc4_version_exists(self):
+    def test_arc4_version_is_strict_version(self):
         try:
             distutils.version.StrictVersion(arc4.__version__)
         except (AttributeError, ValueError) as e:
             self.fail(e)
+
+    def test_arc4_version_is_equal_to_setup_version(self):
+        self.assertEqual(arc4.__version__, setup.VERSION)
 
     def test_init_with_zero_length_key_raises_error(self):
         with self.assertRaisesRegex(ValueError, r'^invalid key length: 0$'):
