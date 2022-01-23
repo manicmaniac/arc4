@@ -14,6 +14,11 @@
 #endif /* __inline__ */
 #endif /* __STDC_VERSION__ < 199901L */
 
+#ifndef Py_STRINGIFY
+#define ARC4_XSTRINGIFY(x) #x
+#define Py_STRINGIFY(x) ARC4_XSTRINGIFY(x)
+#endif
+
 struct arc4_state {
     unsigned char x, y, s[256];
 };
@@ -313,7 +318,8 @@ PyInit_arc4(void)
         return NULL;
     }
     Py_INCREF(&arc4_ARC4Type);
-    PyModule_AddStringConstant(module, "__version__", ARC4_VERSION);
+    PyModule_AddStringConstant(module, "__version__",
+                               Py_STRINGIFY(ARC4_VERSION));
     PyModule_AddObject(module, "ARC4", (PyObject *)&arc4_ARC4Type);
     return module;
 }
@@ -331,7 +337,8 @@ initarc4(void)
         return;
     }
     Py_INCREF(&arc4_ARC4Type);
-    PyModule_AddStringConstant(module, "__version__", ARC4_VERSION);
+    PyModule_AddStringConstant(module, "__version__",
+                               Py_STRINGIFY(ARC4_VERSION));
     PyModule_AddObject(module, "ARC4", (PyObject *)&arc4_ARC4Type);
 }
 #endif /* PY_MAJOR_VERSION >= 3 */
