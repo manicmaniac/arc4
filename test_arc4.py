@@ -66,7 +66,6 @@ class TestARC4(unittest.TestCase):
     if not hasattr(unittest.TestCase, 'assertRaisesRegex'):
         assertRaisesRegex = unittest.TestCase.assertRaisesRegexp
 
-    @unittest.expectedFailure
     def test_arc4_version_exists(self):
         try:
             distutils.version.StrictVersion(arc4.__version__)

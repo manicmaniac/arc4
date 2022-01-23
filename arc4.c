@@ -313,6 +313,7 @@ PyInit_arc4(void)
         return NULL;
     }
     Py_INCREF(&arc4_ARC4Type);
+    PyModule_AddStringConstant(module, "__version__", ARC4_VERSION);
     PyModule_AddObject(module, "ARC4", (PyObject *)&arc4_ARC4Type);
     return module;
 }
@@ -330,6 +331,7 @@ initarc4(void)
         return;
     }
     Py_INCREF(&arc4_ARC4Type);
+    PyModule_AddStringConstant(module, "__version__", ARC4_VERSION);
     PyModule_AddObject(module, "ARC4", (PyObject *)&arc4_ARC4Type);
 }
 #endif /* PY_MAJOR_VERSION >= 3 */
