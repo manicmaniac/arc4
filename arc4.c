@@ -17,20 +17,23 @@ static void
 arc4_init(struct arc4_state *state, const unsigned char *key,
           Py_ssize_t key_size)
 {
-    int i;
-    unsigned char j, k;
+    register int i;
 
     state->x = 0;
     state->y = 0;
     for (i = 0; i < 256; i++) {
         state->s[i] = (unsigned char)i;
     }
-    j = 0;
-    for (i = 0; i < 256; i++) {
-        j += state->s[i] + key[i % key_size];
-        k = state->s[i];
-        state->s[i] = state->s[j];
-        state->s[j] = k;
+    {
+        register unsigned char j, k;
+
+        j = 0;
+        for (i = 0; i < 256; i++) {
+            j += state->s[i] + key[i % key_size];
+            k = state->s[i];
+            state->s[i] = state->s[j];
+            state->s[j] = k;
+        }
     }
 }
 
@@ -38,20 +41,24 @@ static void
 arc4_crypt(struct arc4_state *state, const unsigned char *__restrict input,
            unsigned char *__restrict output, Py_ssize_t size)
 {
-    unsigned char x, y, *s, sx, sy;
-    Py_ssize_t i;
+    register unsigned char x, y, *s;
 
     x = state->x;
     y = state->y;
     s = state->s;
-    for (i = 0; i < size; i++) {
-        x++;
-        y += s[x];
-        sx = s[x];
-        sy = s[y];
-        s[x] = sy;
-        s[y] = sx;
-        output[i] = input[i] ^ s[(sx + sy) & 0xFF];
+    {
+        register unsigned char sx, sy;
+        register Py_ssize_t i;
+
+        for (i = 0; i < size; i++) {
+            x++;
+            y += s[x];
+            sx = s[x];
+            sy = s[y];
+            s[x] = sy;
+            s[y] = sx;
+            output[i] = input[i] ^ s[(sx + sy) & 0xFF];
+        }
     }
     state->x = x;
     state->y = y;
