@@ -7,10 +7,11 @@ except ImportError:
 with open('README.rst') as f:
     long_description = f.read()
 
+version = '0.0.4'
 
 setup(
     name='arc4',
-    version='0.0.4',
+    version=version,
     description=(
         'A small and insanely fast ARCFOUR (RC4) cipher implementation ' +
         'of Python'
@@ -20,7 +21,9 @@ setup(
     author_email='rito.0305@gmail.com',
     url='https://github.com/manicmaniac/arc4',
     ext_modules=[
-        Extension('arc4', sources=['arc4.c'])
+        Extension('arc4',
+                  sources=['arc4.c'],
+                  define_macros=[('ARC4_VERSION', '"{}"'.format(version))])
     ],
     classifiers=[
         'Development Status :: 4 - Beta',

@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 
+import distutils.version
 import doctest
 import functools
 import multiprocessing
@@ -64,6 +65,12 @@ class TestARC4(unittest.TestCase):
     # assertRaisesRegexp is renamed to assertRaisesRegex since Python 3.2.
     if not hasattr(unittest.TestCase, 'assertRaisesRegex'):
         assertRaisesRegex = unittest.TestCase.assertRaisesRegexp
+
+    def test_arc4_version_exists(self):
+        try:
+            distutils.version.StrictVersion(arc4.__version__)
+        except (AttributeError, ValueError) as e:
+            self.fail(e)
 
     def test_init_with_zero_length_key_raises_error(self):
         with self.assertRaisesRegex(ValueError, r'^invalid key length: 0$'):

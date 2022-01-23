@@ -20,7 +20,8 @@ arc4
 A small and insanely fast ARCFOUR (RC4) cipher implementation of Python.
 
 * Strongly focused on performance; entire source code is written in C.
-* Easily installable; single file with no dependency.
+* Thread-safety; you can improve further performance with multi-threading.
+* Easily installable; single file with no dependency, pre-built wheels provided.
 
 Benchmark
 ---------
