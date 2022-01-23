@@ -4,7 +4,7 @@ except ImportError:
     from distutils.core import Extension, setup
 
 
-VERSION = '0.0.4'
+VERSION = '0.1.0'
 
 
 def c_quote(string):
