@@ -7,10 +7,6 @@ except ImportError:
 VERSION = '0.1.0'
 
 
-def c_quote(string):
-    return '"{}"'.format(string)
-
-
 def read_file(path):
     with open(path) as f:
         return f.read()
@@ -31,7 +27,7 @@ if __name__ == '__main__':
         ext_modules=[
             Extension('arc4',
                       sources=['arc4.c'],
-                      define_macros=[('ARC4_VERSION', c_quote(VERSION))]),
+                      define_macros=[('ARC4_VERSION', VERSION)]),
         ],
         classifiers=[
             'Development Status :: 4 - Beta',
