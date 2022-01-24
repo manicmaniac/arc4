@@ -128,40 +128,6 @@ arc4_ARC4_dealloc(struct arc4_ARC4 *self)
     Py_TYPE(self)->tp_free((PyObject *)self);
 }
 
-static inline int
-byteslike_as_string_and_size(PyObject *obj, char **buffer, Py_ssize_t *size)
-{
-#if PY_MAJOR_VERSION >= 3
-    const char *utf8;
-#else
-    PyObject *ascii;
-#endif
-
-    if (PyBytes_Check(obj)) {
-        *buffer = PyBytes_AS_STRING(obj);
-        *size = PyBytes_GET_SIZE(obj);
-        return 0;
-    }
-    if (PyUnicode_Check(obj)) {
-#if PY_MAJOR_VERSION >= 3
-        utf8 = (char *)PyUnicode_AsUTF8AndSize(obj, size);
-        if (utf8 != NULL) {
-            *buffer = (char *)utf8;
-            return 0;
-        }
-#else
-        ascii = PyUnicode_AsASCIIString(obj);
-        if (ascii != NULL) {
-            *buffer = PyBytes_AS_STRING(ascii);
-            *size = PyBytes_GET_SIZE(ascii);
-            Py_DECREF(ascii);
-            return 0;
-        }
-#endif
-    }
-    return -1;
-}
-
 static PyObject *
 arc4_ARC4_crypt(struct arc4_ARC4 *self, PyObject *arg)
 {
@@ -169,17 +135,37 @@ arc4_ARC4_crypt(struct arc4_ARC4 *self, PyObject *arg)
     char *output = NULL;
     Py_ssize_t size = 0;
     PyObject *outputBytes = NULL;
+#if PY_MAJOR_VERSION <= 2
+    PyObject *ascii = NULL;
+#endif
 
     if (arg == NULL) {
         return NULL;
     }
-    if (byteslike_as_string_and_size(arg, (char **)&input, &size) == -1) {
-        if (PyErr_Occurred() == NULL) {
-            PyErr_Format(PyExc_TypeError,
-                         "crypt() argument 1 must be read-only bytes-like "
-                         "object, not %s",
-                         arg->ob_type->tp_name);
+    if (PyBytes_Check(arg)) {
+        input = PyBytes_AS_STRING(arg);
+        size = PyBytes_GET_SIZE(arg);
+    }
+    else if (PyUnicode_Check(arg)) {
+#if PY_MAJOR_VERSION <= 2
+        ascii = PyUnicode_AsASCIIString(arg);
+        if (ascii == NULL) {
+            return NULL;
         }
+        input = PyBytes_AS_STRING(ascii);
+        size = PyBytes_GET_SIZE(ascii);
+#else
+        input = (char *)PyUnicode_AsUTF8AndSize(arg, &size);
+        if (input == NULL) {
+            return NULL;
+        }
+#endif
+    }
+    else {
+        PyErr_Format(PyExc_TypeError,
+                     "crypt() argument 1 must be read-only bytes-like "
+                     "object, not %s",
+                     arg->ob_type->tp_name);
         return NULL;
     }
     outputBytes = PyBytes_FromStringAndSize(NULL, size);
@@ -188,6 +174,9 @@ arc4_ARC4_crypt(struct arc4_ARC4 *self, PyObject *arg)
         arc4_crypt(&(self->state), (const unsigned char *)input,
                    (unsigned char *)output, size);
     Py_END_ALLOW_THREADS
+#if PY_MAJOR_VERSION <= 2
+    Py_XDECREF(ascii);
+#endif
     return outputBytes;
 }
 
