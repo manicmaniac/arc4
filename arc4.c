@@ -135,9 +135,6 @@ arc4_ARC4_crypt(struct arc4_ARC4 *self, PyObject *arg)
     char *output = NULL;
     Py_ssize_t size = 0;
     PyObject *outputBytes = NULL;
-#if PY_MAJOR_VERSION <= 2
-    PyObject *ascii = NULL;
-#endif
 
     if (arg == NULL) {
         return NULL;
@@ -147,19 +144,20 @@ arc4_ARC4_crypt(struct arc4_ARC4 *self, PyObject *arg)
         size = PyBytes_GET_SIZE(arg);
     }
     else if (PyUnicode_Check(arg)) {
-#if PY_MAJOR_VERSION <= 2
-        ascii = PyUnicode_AsASCIIString(arg);
-        if (ascii == NULL) {
-            return NULL;
-        }
-        input = PyBytes_AS_STRING(ascii);
-        size = PyBytes_GET_SIZE(ascii);
-#else
+#if PY_MAJOR_VERSION >= 3
         input = (char *)PyUnicode_AsUTF8AndSize(arg, &size);
         if (input == NULL) {
             return NULL;
         }
-#endif
+#else
+        arg = PyUnicode_AsASCIIString(arg);
+        if (arg == NULL) {
+            return NULL;
+        }
+        outputBytes = arc4_ARC4_crypt(self, arg);
+        Py_DECREF(arg);
+        return outputBytes;
+#endif /* PY_MAJOR_VERSION >= 3 */
     }
     else {
         PyErr_Format(PyExc_TypeError,
@@ -174,9 +172,6 @@ arc4_ARC4_crypt(struct arc4_ARC4 *self, PyObject *arg)
         arc4_crypt(&(self->state), (const unsigned char *)input,
                    (unsigned char *)output, size);
     Py_END_ALLOW_THREADS
-#if PY_MAJOR_VERSION <= 2
-    Py_XDECREF(ascii);
-#endif
     return outputBytes;
 }
 
