@@ -110,7 +110,7 @@ arc4_ARC4_init(struct arc4_ARC4 *self, PyObject *args, PyObject *kwargs)
                      args->ob_type->tp_name);
         return -1;
     }
-#endif
+#endif /* PYPY_VERSION */
     if (key_size <= 0) {
         PyErr_Format(PyExc_ValueError, "invalid key length: %zd", key_size);
         return -1;
