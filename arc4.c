@@ -160,11 +160,10 @@ arc4_ARC4_crypt(struct arc4_ARC4 *self, PyObject *arg)
 #endif /* PY_MAJOR_VERSION >= 3 */
     }
     else {
-        PyErr_Format(PyExc_TypeError,
-                     "crypt() argument 1 must be read-only bytes-like "
-                     "object, not %s",
-                     arg->ob_type->tp_name);
-        return NULL;
+        return PyErr_Format(PyExc_TypeError,
+                            "crypt() argument 1 must be read-only bytes-like "
+                            "object, not %s",
+                            Py_TYPE(arg)->tp_name);
     }
     outputBytes = PyBytes_FromStringAndSize(NULL, size);
     output = PyBytes_AS_STRING(outputBytes);
@@ -309,10 +308,17 @@ PyInit_arc4(void)
     if (module == NULL) {
         return NULL;
     }
+    if (PyModule_AddStringConstant(module, "__version__",
+                                   Py_STRINGIFY(ARC4_VERSION)) < 0) {
+        Py_DECREF(module);
+        return NULL;
+    }
     Py_INCREF(&arc4_ARC4Type);
-    PyModule_AddStringConstant(module, "__version__",
-                               Py_STRINGIFY(ARC4_VERSION));
-    PyModule_AddObject(module, "ARC4", (PyObject *)&arc4_ARC4Type);
+    if (PyModule_AddObject(module, "ARC4", (PyObject *)&arc4_ARC4Type) < 0) {
+        Py_DECREF(&arc4_ARC4Type);
+        Py_DECREF(module);
+        return NULL;
+    }
     return module;
 }
 #else
@@ -328,9 +334,16 @@ initarc4(void)
     if (module == NULL) {
         return;
     }
+    if (PyModule_AddStringConstant(module, "__version__",
+                                   Py_STRINGIFY(ARC4_VERSION)) < 0) {
+        Py_DECREF(module);
+        return;
+    }
     Py_INCREF(&arc4_ARC4Type);
-    PyModule_AddStringConstant(module, "__version__",
-                               Py_STRINGIFY(ARC4_VERSION));
-    PyModule_AddObject(module, "ARC4", (PyObject *)&arc4_ARC4Type);
+    if (PyModule_AddObject(module, "ARC4", (PyObject *)&arc4_ARC4Type) < 0) {
+        Py_DECREF(&arc4_ARC4Type);
+        Py_DECREF(module);
+        return;
+    }
 }
 #endif /* PY_MAJOR_VERSION >= 3 */

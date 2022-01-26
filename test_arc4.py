@@ -2,7 +2,10 @@
 
 from __future__ import unicode_literals
 
-import distutils.version
+try:
+    from setuptools.distutils.version import StrictVersion
+except ImportError:
+    from distutils.version import StrictVersion
 import doctest
 import functools
 import multiprocessing
@@ -69,7 +72,7 @@ class TestARC4(unittest.TestCase):
 
     def test_arc4_version_is_strict_version(self):
         try:
-            distutils.version.StrictVersion(arc4.__version__)
+            StrictVersion(arc4.__version__)
         except (AttributeError, ValueError) as e:
             self.fail(e)
 
