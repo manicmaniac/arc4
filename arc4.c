@@ -252,6 +252,8 @@ PyDoc_STRVAR(arc4_ARC4Type_doc,
              "You have to initialize an instance in the beginning of each "
              "operations.\n");
 
+PyDoc_STRVAR(arc4_doc, "ARCFOUR (RC4) implementation in Python/C API.");
+
 static PyTypeObject arc4_ARC4Type = {
     PyVarObject_HEAD_INIT(NULL, 0) /* A trailing comma is included */
     "arc4.ARC4",
@@ -297,7 +299,7 @@ static PyTypeObject arc4_ARC4Type = {
 static struct PyModuleDef arc4_module = {
     PyModuleDef_HEAD_INIT, /* m_base */
     "arc4",                /* m_name */
-    NULL,                  /* m_doc */
+    arc4_doc,              /* m_doc */
     -1,                    /* m_size */
     NULL                   /* m_methods */
 };
@@ -336,7 +338,7 @@ initarc4(void)
     if (PyType_Ready(&arc4_ARC4Type) < 0) {
         return;
     }
-    module = Py_InitModule("arc4", NULL);
+    module = Py_InitModule3("arc4", NULL, arc4_doc);
     if (module == NULL) {
         return;
     }
