@@ -309,20 +309,18 @@ PyInit_arc4(void)
     if (module == NULL) {
         return NULL;
     }
-    Py_INCREF(&arc4_ARC4Type);
     if (PyModule_AddStringConstant(module, "__version__",
                                    Py_STRINGIFY(ARC4_VERSION)) == -1) {
-        goto fail;
+        Py_DECREF(module);
+        return NULL;
     }
+    Py_INCREF(&arc4_ARC4Type);
     if (PyModule_AddObject(module, "ARC4", (PyObject *)&arc4_ARC4Type) == -1) {
-        goto fail;
+        Py_DECREF(&arc4_ARC4Type);
+        Py_DECREF(module);
+        return NULL;
     }
     return module;
-
-fail:
-    Py_DECREF(&arc4_ARC4Type);
-    Py_DECREF(module);
-    return NULL;
 }
 #else
 PyMODINIT_FUNC
@@ -337,17 +335,16 @@ initarc4(void)
     if (module == NULL) {
         return;
     }
-    Py_INCREF(&arc4_ARC4Type);
     if (PyModule_AddStringConstant(module, "__version__",
                                    Py_STRINGIFY(ARC4_VERSION)) == -1) {
-        goto fail;
+        Py_DECREF(module);
+        return;
     }
+    Py_INCREF(&arc4_ARC4Type);
     if (PyModule_AddObject(module, "ARC4", (PyObject *)&arc4_ARC4Type) == -1) {
-        goto fail;
+        Py_DECREF(&arc4_ARC4Type);
+        Py_DECREF(module);
+        return;
     }
-
-fail:
-    Py_DECREF(&arc4_ARC4Type);
-    Py_DECREF(module);
 }
 #endif /* PY_MAJOR_VERSION >= 3 */
