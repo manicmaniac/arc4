@@ -132,13 +132,13 @@ if __name__ == '__main__':
         single_thread_values.append(benchmark(rc4_code, NCPU, 1) * 100)
         multi_thread_values.append(
                 benchmark(rc4_code, NCPU * 2, NCPU) * N // NCPU // 2)
-    print('cpu_count: {}'.format(NCPU))
     rates = [1, single_thread_values[1] / single_thread_values[0]]
     if not args.skip_rc4:
         rates.append(single_thread_values[2] / single_thread_values[0])
     result = zip(labels, single_thread_values, multi_thread_values, rates)
+    print('library,1 thread,{} threads,rate'.format(NCPU))
     for label, single, multi, rate in result:
-        print('{}: {}, {} ({})'.format(label, single, multi, rate))
+        print('{},{:g},{:g},{:g}'.format(label, single, multi, rate))
     if args.output:
         save_graph_image(args.output, labels, single_thread_values,
                          multi_thread_values)
