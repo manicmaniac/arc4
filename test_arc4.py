@@ -65,10 +65,19 @@ def raises_unicode_encode_error_on_python_2(f):
     return decorated
 
 
+def expected_failure_if(condition):
+    if condition:
+        return unittest.expectedFailure
+    return lambda x: x
+
+
 class TestARC4(unittest.TestCase):
     # assertRaisesRegexp is renamed to assertRaisesRegex since Python 3.2.
     if not hasattr(unittest.TestCase, 'assertRaisesRegex'):
         assertRaisesRegex = unittest.TestCase.assertRaisesRegexp
+
+    def test_arc4_module_has_doc(self):
+        self.assertIsNotNone(arc4.__doc__)
 
     def test_arc4_version_is_strict_version(self):
         try:
@@ -78,6 +87,9 @@ class TestARC4(unittest.TestCase):
 
     def test_arc4_version_is_equal_to_setup_version(self):
         self.assertEqual(arc4.__version__, setup.VERSION)
+
+    def test_arc4_class_has_doc(self):
+        self.assertIsNotNone(arc4.ARC4.__doc__)
 
     def test_init_with_zero_length_key_raises_error(self):
         with self.assertRaisesRegex(ValueError, r'^invalid key length: 0$'):
@@ -112,6 +124,10 @@ class TestARC4(unittest.TestCase):
             pattern = r'^argument 1 must be .*, not memoryview$'
         with self.assertRaisesRegex(TypeError, pattern):
             arc4.ARC4(memoryview(b'spam'))
+
+    @expected_failure_if(platform.python_implementation() == 'PyPy')
+    def test_encrypt_has_doc(self):
+        self.assertIsNotNone(arc4.ARC4.encrypt.__doc__)
 
     def test_encrypt_with_long_bytes_returns_encrypted_bytes(self):
         cipher = arc4.ARC4(KEY)
@@ -192,6 +208,10 @@ class TestARC4(unittest.TestCase):
         multi_thread_elapsed_time = timeit.timeit(code, setup,
                                                   number=number // cpu_count)
         self.assertLess(multi_thread_elapsed_time, single_thread_elapsed_time)
+
+    @expected_failure_if(platform.python_implementation() == 'PyPy')
+    def test_decrypt_has_doc(self):
+        self.assertIsNotNone(arc4.ARC4.decrypt.__doc__)
 
     def test_decrypt_with_long_bytes_returns_decrypted_bytes(self):
         cipher = arc4.ARC4(KEY)

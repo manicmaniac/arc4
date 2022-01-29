@@ -229,7 +229,8 @@ PyDoc_STRVAR(arc4_ARC4_encrypt_doc,
 static PyMethodDef arc4_ARC4_methods[] = {
     {"decrypt", (PyCFunction)arc4_ARC4_crypt, METH_O, arc4_ARC4_decrypt_doc},
     {"encrypt", (PyCFunction)arc4_ARC4_crypt, METH_O, arc4_ARC4_encrypt_doc},
-    {NULL}};
+    {NULL} /* sentinel */
+};
 
 PyDoc_STRVAR(arc4_ARC4Type_doc,
              "A class represents a session of RC4 stream cipher.\n"
@@ -250,6 +251,8 @@ PyDoc_STRVAR(arc4_ARC4Type_doc,
              "-----\n"
              "You have to initialize an instance in the beginning of each "
              "operations.\n");
+
+PyDoc_STRVAR(arc4_doc, "ARCFOUR (RC4) implementation in Python/C API.");
 
 static PyTypeObject arc4_ARC4Type = {
     PyVarObject_HEAD_INIT(NULL, 0) /* A trailing comma is included */
@@ -293,8 +296,13 @@ static PyTypeObject arc4_ARC4Type = {
 };
 
 #if PY_MAJOR_VERSION >= 3
-static struct PyModuleDef arc4_module = {PyModuleDef_HEAD_INIT, "arc4", NULL,
-                                         -1, NULL};
+static struct PyModuleDef arc4_module = {
+    PyModuleDef_HEAD_INIT, /* m_base */
+    "arc4",                /* m_name */
+    arc4_doc,              /* m_doc */
+    -1,                    /* m_size */
+    NULL                   /* m_methods */
+};
 
 PyMODINIT_FUNC
 PyInit_arc4(void)
@@ -330,7 +338,7 @@ initarc4(void)
     if (PyType_Ready(&arc4_ARC4Type) < 0) {
         return;
     }
-    module = Py_InitModule("arc4", NULL);
+    module = Py_InitModule3("arc4", NULL, arc4_doc);
     if (module == NULL) {
         return;
     }
