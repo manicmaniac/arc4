@@ -65,6 +65,12 @@ def raises_unicode_encode_error_on_python_2(f):
     return decorated
 
 
+def expected_failure_if(condition):
+    if condition:
+        return unittest.expectedFailure
+    return lambda x: x
+
+
 class TestARC4(unittest.TestCase):
     # assertRaisesRegexp is renamed to assertRaisesRegex since Python 3.2.
     if not hasattr(unittest.TestCase, 'assertRaisesRegex'):
@@ -119,6 +125,7 @@ class TestARC4(unittest.TestCase):
         with self.assertRaisesRegex(TypeError, pattern):
             arc4.ARC4(memoryview(b'spam'))
 
+    @expected_failure_if(platform.python_implementation() == 'PyPy')
     def test_encrypt_has_doc(self):
         self.assertIsNotNone(arc4.ARC4.encrypt.__doc__)
 
@@ -202,6 +209,7 @@ class TestARC4(unittest.TestCase):
                                                   number=number // cpu_count)
         self.assertLess(multi_thread_elapsed_time, single_thread_elapsed_time)
 
+    @expected_failure_if(platform.python_implementation() == 'PyPy')
     def test_decrypt_has_doc(self):
         self.assertIsNotNone(arc4.ARC4.decrypt.__doc__)
 
