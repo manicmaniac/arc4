@@ -33,6 +33,10 @@ Below is benchmark metrics against 3 major RC4 implementations.
 
 The whole benchmark code is in ``./benchmark.py``.
 
+.. note::
+
+   arc4 supports multi-threading but it is too fast to ignore the overhead of context-switching, in most cases.
+
 Install
 -------
 
