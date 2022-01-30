@@ -133,6 +133,15 @@ class TestARC4(unittest.TestCase):
         cipher = arc4.ARC4(KEY)
         self.assertEqual(LOREM_ARC4, cipher.encrypt(LOREM))
 
+    def test_encrypt_multiple_times_returns_encrypted_bytes(self):
+        cipher = arc4.ARC4(KEY)
+        encrypted = b''
+        for c in LOREM:
+            if isinstance(c, int):
+                c = chr(c)
+            encrypted += cipher.encrypt(c)
+        self.assertEqual(LOREM_ARC4, encrypted)
+
     @raises_unicode_encode_error_on_python_2
     def test_encrypt_with_unicode_returns_encrypted_bytes(self):
         cipher = arc4.ARC4(b'spam')
