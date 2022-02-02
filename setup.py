@@ -29,6 +29,12 @@ if __name__ == '__main__':
                       sources=['arc4.c'],
                       define_macros=[('ARC4_VERSION', VERSION)]),
         ],
+        keywords=[
+            'ARCFOUR',
+            'cipher',
+            'cryptography',
+            'RC4',
+        ],
         classifiers=[
             'Development Status :: 4 - Beta',
             'License :: OSI Approved :: MIT License',
