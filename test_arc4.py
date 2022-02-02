@@ -227,6 +227,24 @@ class TestARC4(unittest.TestCase):
         self.assertEqual(LOREM, cipher.decrypt(LOREM_ARC4))
 
 
+class DocTestParser(doctest.DocTestParser):
+    def get_examples(self, string, name='<string>'):
+        examples = doctest.DocTestParser.get_examples(self, string, name)
+        if sys.version_info.major <= 2:
+            for example in examples:
+                # In Python 2, expecting bytes literal fails because all the
+                # string-like literals' prefix is stripped.
+                #
+                # e.g. A doctest expecting b'foo' always fails because the
+                # output would be 'foo'
+                #
+                # So this custom parser strips a prefix of literals.
+                if example.want.startswith("b'"):
+                    example.want = example.want[1:]
+        return examples
+
+
 def load_tests(loader, tests, ignore):
     tests.addTests(doctest.DocTestSuite(arc4))
+    tests.addTests(doctest.DocFileSuite('README.rst', parser=DocTestParser()))
     return tests
