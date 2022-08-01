@@ -108,6 +108,7 @@ class TestARC4(unittest.TestCase):
 
     @unittest.skipUnless(hasattr(builtins, 'buffer'),
                          'buffer only exists in Python 2')
+    @expected_failure_if(platform.python_implementation() == 'PyPy')
     def test_init_with_buffer_returns_instance(self):
         self.assertIsInstance(arc4.ARC4(builtins.buffer('spam')), arc4.ARC4)
 
