@@ -3,6 +3,10 @@
 from __future__ import unicode_literals
 
 try:
+    import builtins
+except ImportError:
+    import __builtin__ as builtins
+try:
     from setuptools.distutils.version import StrictVersion
 except ImportError:
     from distutils.version import StrictVersion
@@ -102,13 +106,10 @@ class TestARC4(unittest.TestCase):
     def test_init_with_unicode_returns_instance(self):
         self.assertIsInstance(arc4.ARC4(u'スパム'), arc4.ARC4)
 
-    @unittest.skipUnless(hasattr(__builtins__, 'buffer'),
+    @unittest.skipUnless(hasattr(builtins, 'buffer'),
                          'buffer only exists in Python 2')
-    def test_init_with_buffer_raises_type_error(self):
-        with self.assertRaisesRegex(
-                TypeError,
-                r'argument 1 must be .*, not buffer'):
-            arc4.ARC4(buffer('spam'))  # noqa
+    def test_init_with_buffer_returns_instance(self):
+        self.assertIsInstance(arc4.ARC4(buffer('spam')), arc4.ARC4)
 
     def test_init_with_bytearray_raises_type_error(self):
         with self.assertRaisesRegex(
@@ -147,7 +148,7 @@ class TestARC4(unittest.TestCase):
         cipher = arc4.ARC4(b'spam')
         self.assertEqual(b'Q\xcd\xb1!\xecg', cipher.encrypt(u'ハム'))
 
-    @unittest.skipUnless(hasattr(__builtins__, 'buffer'),
+    @unittest.skipUnless(hasattr(builtins, 'buffer'),
                          'buffer only exists in Python 2')
     def test_encrypt_with_buffer_raises_type_error(self):
         cipher = arc4.ARC4(b'spam')
