@@ -109,7 +109,7 @@ class TestARC4(unittest.TestCase):
     @unittest.skipUnless(hasattr(builtins, 'buffer'),
                          'buffer only exists in Python 2')
     def test_init_with_buffer_returns_instance(self):
-        self.assertIsInstance(arc4.ARC4(buffer('spam')), arc4.ARC4)
+        self.assertIsInstance(arc4.ARC4(builtins.buffer('spam')), arc4.ARC4)
 
     def test_init_with_bytearray_raises_type_error(self):
         with self.assertRaisesRegex(
@@ -155,7 +155,7 @@ class TestARC4(unittest.TestCase):
         with self.assertRaisesRegex(
                 TypeError,
                 r'^crypt\(\) argument 1 must be .*, not buffer$'):
-            cipher.encrypt(buffer(b'ham'))  # noqa
+            cipher.encrypt(builtins.buffer(b'ham'))
 
     def test_encrypt_with_bytearray_raises_type_error(self):
         cipher = arc4.ARC4(b'spam')
