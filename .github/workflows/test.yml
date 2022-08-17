@@ -57,3 +57,20 @@ jobs:
       run: ./cc-test-reporter sum-coverage --output - coverage.*.xml | ./cc-test-reporter upload-coverage --debug --input -
       env:
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+  typing-test:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.10'
+    - run: pip install . mypy
+    - run: |
+        cat <<EOF >typing-test.py
+        from arc4 import ARC4
+        arc4 = ARC4(b'key')
+        cipher = arc4.encrypt(b'data')
+        plain = arc4.decrypt(b'cipher')
+        EOF
+        mypy --no-incremental typing-test.py
+      working-directory: ${{ env.TMPDIR }}
