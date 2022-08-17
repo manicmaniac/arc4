@@ -175,10 +175,10 @@ class TestARC4(unittest.TestCase):
     def test_encrypt_with_list_raises_type_error(self):
         cipher = arc4.ARC4(b'spam')
         if sys.version_info.major >= 3:
-            message = r"^a bytes-like object is required, not 'list'"
+            message = (r'^crypt\(\) argument 1 must be read-only bytes-like ' +
+                       r'object, not list')
         else:
             message = r'^\crypt\(\) argument 1 must be .*, not list'
-        message = r''
         with self.assertRaisesRegex(TypeError, message):
             cipher.encrypt([0x68, 0x61, 0x6d])
 
