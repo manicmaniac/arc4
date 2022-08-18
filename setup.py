@@ -29,6 +29,10 @@ if __name__ == '__main__':
                       sources=['arc4.c'],
                       define_macros=[('ARC4_VERSION', VERSION)]),
         ],
+        package_data={
+            'arc4-stubs': ['__init__.pyi'],
+        },
+        packages=['arc4-stubs'],
         keywords=[
             'ARCFOUR',
             'cipher',
