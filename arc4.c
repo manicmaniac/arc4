@@ -106,13 +106,23 @@ struct arc4_ARC4 {
     struct arc4_state state;
 };
 
+static const char arc4_str_deprecation_warning[] =
+    "passing an object other than 'bytes' as argument 1 is deprecated.";
+
 static int
 arc4_ARC4_init(struct arc4_ARC4 *self, PyObject *args, PyObject *kwargs)
 {
     const char *key = NULL;
     Py_ssize_t key_size = 0;
+    int is_bytes = 0;
 
     if (!PyArg_ParseTuple(args, "s#", &key, &key_size)) {
+        return -1;
+    }
+    args = PyTuple_GET_ITEM(args, 0);
+    is_bytes = PyBytes_Check(args);
+    if (!is_bytes && PyErr_WarnEx(PyExc_DeprecationWarning,
+                                  arc4_str_deprecation_warning, 1) == -1) {
         return -1;
     }
 #ifdef PYPY_VERSION
@@ -122,8 +132,7 @@ arc4_ARC4_init(struct arc4_ARC4 *self, PyObject *args, PyObject *kwargs)
      * > a few corner cases don’t raise the same exception
      * https://doc.pypy.org/en/latest/cpython_differences.html#miscellaneous
      */
-    args = PyTuple_GET_ITEM(args, 0);
-    if (!(PyBytes_Check(args) || PyUnicode_Check(args))) {
+    if (!(is_bytes || PyUnicode_Check(args))) {
         PyErr_Format(PyExc_TypeError,
                      "argument 1 must be read-only bytes-like object, not %s",
                      args->ob_type->tp_name);
@@ -163,6 +172,10 @@ arc4_ARC4_crypt(struct arc4_ARC4 *self, PyObject *arg)
         size = PyBytes_GET_SIZE(arg);
     }
     else if (PyUnicode_Check(arg)) {
+        if (PyErr_WarnEx(PyExc_DeprecationWarning,
+                         arc4_str_deprecation_warning, 1) == -1) {
+            return NULL;
+        }
 #if PY_MAJOR_VERSION >= 3
         input = (char *)PyUnicode_AsUTF8AndSize(arg, &size);
         if (input == NULL) {
