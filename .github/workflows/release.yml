@@ -15,7 +15,8 @@ jobs:
         python-version: '3.10'
     - run: python setup.py sdist --verbose
     - uses: actions/upload-artifact@v2
-      path: dist/arc4-*.tar.gz
+      with:
+        path: dist/arc4-*.tar.gz
   build-wheels:
     runs-on: "${{ matrix.os }}"
     strategy:
