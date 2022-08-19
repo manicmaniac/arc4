@@ -15,7 +15,8 @@ jobs:
         python-version: '3.10'
     - run: python setup.py sdist --verbose
     - uses: actions/upload-artifact@v2
-      path: dist/arc4-*.tar.gz
+      with:
+        path: dist/arc4-*.tar.gz
   build-wheels:
     runs-on: "${{ matrix.os }}"
     strategy:
@@ -85,9 +86,9 @@ jobs:
         python-version: '3.10'
     - run: pip install twine
     - uses: actions/download-artifact@v2
-    - run: twine upload --verbose *
+    - run: twine upload --verbose artifact/*
       env:
         TWINE_NON_INTERACTIVE: 1
-        TWINE_REPOSITORY_URL: https://test.pypi.org/legacy/
+        TWINE_REPOSITORY_URL: https://upload.pypi.org/legacy/
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
