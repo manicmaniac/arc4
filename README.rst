@@ -60,14 +60,14 @@ Usage
 .. code:: python
 
    >>> from arc4 import ARC4
-   >>> arc4 = ARC4('key')
-   >>> cipher = arc4.encrypt('some plain text to encrypt')
+   >>> arc4 = ARC4(b'key')
+   >>> cipher = arc4.encrypt(b'some plain text to encrypt')
 
 Because RC4 is a stream cipher, you must initialize RC4 object in the beginning of each operations.
 
 .. code:: python
 
-   >>> arc4 = ARC4('key')
+   >>> arc4 = ARC4(b'key')
    >>> arc4.decrypt(cipher)
    b'some plain text to encrypt'
 
