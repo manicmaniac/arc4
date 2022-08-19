@@ -69,6 +69,20 @@ def raises_unicode_encode_error_on_python_2(f):
     return decorated
 
 
+def raises_deprecation_warning(f):
+    @functools.wraps(f)
+    def decorated(self, *args, **kwargs):
+        with self.assertWarns(DeprecationWarning):
+            return f(self, *args, **kwargs)
+    return decorated
+
+
+def raises_deprecation_warning_if(condition):
+    if condition:
+        return raises_deprecation_warning
+    return lambda x: x
+
+
 def expected_failure_if(condition):
     if condition:
         return unittest.expectedFailure
@@ -103,6 +117,7 @@ class TestARC4(unittest.TestCase):
         self.assertIsInstance(arc4.ARC4(b'spam'), arc4.ARC4)
 
     @raises_unicode_encode_error_on_python_2
+    @raises_deprecation_warning_if(sys.version_info.major >= 3)
     def test_init_with_unicode_returns_instance(self):
         self.assertIsInstance(arc4.ARC4(u'スパム'), arc4.ARC4)
 
@@ -112,12 +127,18 @@ class TestARC4(unittest.TestCase):
     def test_init_with_buffer_returns_instance(self):
         self.assertIsInstance(arc4.ARC4(builtins.buffer('spam')), arc4.ARC4)
 
+    @raises_deprecation_warning_if(
+            platform.python_implementation() == 'PyPy' and
+            sys.version_info.major >= 3)
     def test_init_with_bytearray_raises_type_error(self):
         with self.assertRaisesRegex(
                 TypeError,
                 r'argument 1 must be .*, not bytearray'):
             arc4.ARC4(bytearray([0x66, 0x6f, 0x6f]))
 
+    @raises_deprecation_warning_if(
+            platform.python_implementation() == 'PyPy' and
+            sys.version_info.major >= 3)
     def test_init_with_memoryview_raises_type_error(self):
         if (platform.python_implementation() == 'PyPy' and
                 sys.version_info.major <= 2):
@@ -140,11 +161,12 @@ class TestARC4(unittest.TestCase):
         encrypted = b''
         for c in LOREM:
             if isinstance(c, int):
-                c = chr(c)
+                c = chr(c).encode('utf-8')
             encrypted += cipher.encrypt(c)
         self.assertEqual(LOREM_ARC4, encrypted)
 
     @raises_unicode_encode_error_on_python_2
+    @raises_deprecation_warning_if(sys.version_info.major >= 3)
     def test_encrypt_with_unicode_returns_encrypted_bytes(self):
         cipher = arc4.ARC4(b'spam')
         self.assertEqual(b'Q\xcd\xb1!\xecg', cipher.encrypt(u'ハム'))
