@@ -63,6 +63,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: clang-format
       run: clang-format --Werror --dry-run arc4.c
-    - run: pip install flake8 pygments restructuredtext_lint
+    - run: pip install . flake8 mypy pygments restructuredtext_lint
     - run: flake8
+    - run: stubtest arc4
     - run: rst-lint README.rst
