@@ -8,8 +8,8 @@ jobs:
       fail-fast: false
       matrix:
         os:
-        - macOS-latest
-        - windows-latest
+        - macOS-11
+        - windows-2019
         python-version:
         - '2.7'
         - '3.5'
@@ -23,9 +23,9 @@ jobs:
         - 'pypy-3.8'
         exclude:
         # Needs missing Visual C++ 9.0
-        - os: windows-latest
+        - os: windows-2019
           python-version: '2.7'
-        - os: windows-latest
+        - os: windows-2019
           python-version: 'pypy-2.7'
     steps:
     - uses: actions/checkout@v2
@@ -38,7 +38,7 @@ jobs:
       with:
         path: dist/*whl
   build-manylinux-wheels:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     container:
       image: quay.io/pypa/manylinux_2_24_x86_64
     strategy:
