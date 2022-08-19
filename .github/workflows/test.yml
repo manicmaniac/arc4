@@ -57,3 +57,12 @@ jobs:
       run: ./cc-test-reporter sum-coverage --output - coverage.*.xml | ./cc-test-reporter upload-coverage --debug --input -
       env:
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: clang-format
+      run: clang-format --Werror --dry-run arc4.c
+    - run: pip install flake8 pygments restructuredtext_lint
+    - run: flake8
+    - run: rst-lint README.rst
