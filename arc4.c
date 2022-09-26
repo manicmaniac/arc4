@@ -1,6 +1,10 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
+#ifndef HAVE_STDINT_H
+typedef unsigned char uint_fast8_t;
+#endif /* HAVE_STDINT_H */
+
 /* "restrict" qualifier and "inline" function specifier were introduced in C99.
  * See http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1124.pdf
  *
@@ -28,7 +32,7 @@
 #endif /* Py_STRINGIFY */
 
 struct arc4_state {
-    unsigned char x, y, s[256];
+    uint_fast8_t x, y, s[256];
 };
 
 static const struct arc4_state arc4_initial_state = {
@@ -59,16 +63,16 @@ static const struct arc4_state arc4_initial_state = {
 };
 
 static inline void
-arc4_init(struct arc4_state *state, const unsigned char *key,
+arc4_init(struct arc4_state *state, const uint_fast8_t *key,
           Py_ssize_t key_size)
 {
-    register unsigned char *s = state->s;
+    register uint_fast8_t *s = state->s;
     register int i;
-    register unsigned char j = 0;
+    register uint_fast8_t j = 0;
 
     memcpy(state, &arc4_initial_state, sizeof(*state));
     for (i = 0; i < 256; i++) {
-        register unsigned char k = s[i];
+        register uint_fast8_t k = s[i];
 
         j += k + key[i % key_size];
         s[i] = s[j];
@@ -77,14 +81,14 @@ arc4_init(struct arc4_state *state, const unsigned char *key,
 }
 
 static inline void
-arc4_crypt(struct arc4_state *state, const unsigned char *restrict input,
-           unsigned char *restrict output, Py_ssize_t size)
+arc4_crypt(struct arc4_state *state, const uint_fast8_t *restrict input,
+           uint_fast8_t *restrict output, Py_ssize_t size)
 {
-    register unsigned char x = state->x;
-    register unsigned char y = state->y;
+    register uint_fast8_t x = state->x;
+    register uint_fast8_t y = state->y;
     {
-        register unsigned char *s = state->s;
-        register unsigned char sx, sy;
+        register uint_fast8_t *s = state->s;
+        register uint_fast8_t sx, sy;
         register Py_ssize_t i;
 
         for (i = 0; i < size; i++) {
@@ -144,7 +148,7 @@ arc4_ARC4_init(struct arc4_ARC4 *self, PyObject *args, PyObject *kwargs)
         return -1;
     }
     Py_BEGIN_ALLOW_THREADS
-        arc4_init(&(self->state), (const unsigned char *)key, key_size);
+        arc4_init(&(self->state), (const uint_fast8_t *)key, key_size);
     Py_END_ALLOW_THREADS
     return 0;
 }
@@ -200,8 +204,8 @@ arc4_ARC4_crypt(struct arc4_ARC4 *self, PyObject *arg)
     outputBytes = PyBytes_FromStringAndSize(NULL, size);
     output = PyBytes_AS_STRING(outputBytes);
     Py_BEGIN_ALLOW_THREADS
-        arc4_crypt(&(self->state), (const unsigned char *)input,
-                   (unsigned char *)output, size);
+        arc4_crypt(&(self->state), (const uint_fast8_t *)input,
+                   (uint_fast8_t *)output, size);
     Py_END_ALLOW_THREADS
     return outputBytes;
 }
