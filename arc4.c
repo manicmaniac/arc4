@@ -135,7 +135,7 @@ arc4_ARC4_init(struct arc4_ARC4 *self, PyObject *args, PyObject *kwargs)
     if (!(is_bytes || PyUnicode_Check(args))) {
         PyErr_Format(PyExc_TypeError,
                      "argument 1 must be read-only bytes-like object, not %s",
-                     args->ob_type->tp_name);
+                     Py_TYPE(args)->tp_name);
         return -1;
     }
 #endif /* PYPY_VERSION */
