@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-20.04
     needs: test
     steps:
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v3
       with:
         name: coverages
     - name: Install cc-test-reporter
