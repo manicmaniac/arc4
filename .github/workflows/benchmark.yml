@@ -11,7 +11,7 @@ jobs:
         python-version: '3.9'
     - run: pip install . matplotlib pycrypto rc4
     - run: nice -19 python benchmark.py -o benchmark.svg
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: benchmark
         path: benchmark.svg
