@@ -31,24 +31,14 @@ jobs:
         - macOS-11
         - windows-2019
         python-version:
-        - '2.7'
-        - '3.5'
-        - '3.6'
         - '3.7'
         - '3.8'
         - '3.9'
         - '3.10'
         - '3.11'
-        - 'pypy-2.7'
         - 'pypy-3.7'
         - 'pypy-3.8'
         - 'pypy-3.9'
-        exclude:
-        # Needs missing Visual C++ 9.0
-        - os: windows-2019
-          python-version: '2.7'
-        - os: windows-2019
-          python-version: 'pypy-2.7'
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
@@ -67,7 +57,6 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-        - cp36-cp36m
         - cp37-cp37m
         - cp38-cp38
         - cp39-cp39
