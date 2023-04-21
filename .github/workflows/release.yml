@@ -96,3 +96,9 @@ jobs:
         python-version: '3.11'
     - run: pip install twine
     - uses: actions/download-artifact@v3
+    - run: twine upload --verbose artifact/*
+      env:
+        TWINE_NON_INTERACTIVE: 1
+        TWINE_REPOSITORY_URL: https://upload.pypi.org/legacy/
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
