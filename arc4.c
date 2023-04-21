@@ -19,14 +19,6 @@
 #endif /* __inline__ */
 #endif /* __STDC_VERSION__ < 199901L */
 
-/* Backport of the convenience macro introduced in Python 3.5
- * See https://github.com/python/cpython/blob/v3.5.0/Include/pymacro.h#L19
- */
-#ifndef Py_STRINGIFY
-#define ARC4_XSTRINGIFY(x) #x
-#define Py_STRINGIFY(x) ARC4_XSTRINGIFY(x)
-#endif /* Py_STRINGIFY */
-
 struct arc4_state {
     unsigned char x, y, s[256];
 };
@@ -176,20 +168,10 @@ arc4_ARC4_crypt(struct arc4_ARC4 *self, PyObject *arg)
                          arc4_str_deprecation_warning, 1) == -1) {
             return NULL;
         }
-#if PY_MAJOR_VERSION >= 3
         input = (char *)PyUnicode_AsUTF8AndSize(arg, &size);
         if (input == NULL) {
             return NULL;
         }
-#else
-        arg = PyUnicode_AsASCIIString(arg);
-        if (arg == NULL) {
-            return NULL;
-        }
-        outputBytes = arc4_ARC4_crypt(self, arg);
-        Py_DECREF(arg);
-        return outputBytes;
-#endif /* PY_MAJOR_VERSION >= 3 */
     }
     else {
         return PyErr_Format(PyExc_TypeError,
@@ -327,7 +309,6 @@ static PyTypeObject arc4_ARC4Type = {
     PyType_GenericNew,             /* tp_new */
 };
 
-#if PY_MAJOR_VERSION >= 3
 static struct PyModuleDef arc4_module = {
     PyModuleDef_HEAD_INIT, /* m_base */
     "arc4",                /* m_name */
@@ -361,29 +342,3 @@ PyInit_arc4(void)
     }
     return module;
 }
-#else
-PyMODINIT_FUNC
-initarc4(void)
-{
-    PyObject *module;
-
-    if (PyType_Ready(&arc4_ARC4Type) < 0) {
-        return;
-    }
-    module = Py_InitModule3("arc4", NULL, arc4_doc);
-    if (module == NULL) {
-        return;
-    }
-    if (PyModule_AddStringConstant(module, "__version__",
-                                   Py_STRINGIFY(ARC4_VERSION)) < 0) {
-        Py_DECREF(module);
-        return;
-    }
-    Py_INCREF(&arc4_ARC4Type);
-    if (PyModule_AddObject(module, "ARC4", (PyObject *)&arc4_ARC4Type) < 0) {
-        Py_DECREF(&arc4_ARC4Type);
-        Py_DECREF(module);
-        return;
-    }
-}
-#endif /* PY_MAJOR_VERSION >= 3 */
