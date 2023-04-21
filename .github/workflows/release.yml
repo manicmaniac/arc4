@@ -62,7 +62,7 @@ jobs:
   build-manylinux-wheels:
     runs-on: ubuntu-20.04
     container:
-      image: quay.io/pypa/manylinux_2_24_x86_64
+      image: quay.io/pypa/manylinux_2_28_x86_64
     strategy:
       fail-fast: false
       matrix:
@@ -79,7 +79,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - run: /opt/python/${{ matrix.python-version }}/bin/pip wheel .
-    - run: auditwheel repair arc4-*-linux*.whl --plat manylinux_2_17_x86_64
+    - run: auditwheel repair arc4-*-linux*.whl --plat manylinux_2_28_x86_64
     - uses: actions/upload-artifact@v3
       with:
         path: wheelhouse/arc4-*-manylinux*.whl
