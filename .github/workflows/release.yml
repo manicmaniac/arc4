@@ -5,6 +5,11 @@ on:
     tags:
     - '*.*.*'
   workflow_dispatch:
+    inputs:
+      dry-run:
+        type: boolean
+        description: Do not deploy to PyPI
+        default: true
 jobs:
   build-sdist:
     runs-on: ubuntu-20.04
@@ -79,6 +84,7 @@ jobs:
       with:
         path: wheelhouse/arc4-*-manylinux*.whl
   deploy:
+    if: ${{ github.event_name == 'push' || !github.event.inputs.dry-run }}
     needs:
     - build-sdist
     - build-wheels
