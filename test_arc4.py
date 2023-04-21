@@ -1,11 +1,3 @@
-# coding:utf-8
-
-from __future__ import unicode_literals
-
-try:
-    import builtins
-except ImportError:
-    import __builtin__ as builtins
 try:
     from setuptools.distutils.version import StrictVersion
 except ImportError:
@@ -14,7 +6,6 @@ import doctest
 import functools
 import multiprocessing
 import platform
-import sys
 import textwrap
 import timeit
 import unittest
@@ -58,17 +49,6 @@ LOREM_ARC4 = b"""\xf0\xa8\x59\xec\xdf\x9d\xbd\x95\x52\x91\x66\x72\x50\x01\x0d\
 \x1e\xd4\x53\xda\x1c\xa2\xc7\x5b\xb5\x94\x5d\xc0"""
 
 
-def raises_unicode_encode_error_on_python_2(f):
-    if sys.version_info.major >= 3:
-        return f
-
-    @functools.wraps(f)
-    def decorated(self, *args, **kwargs):
-        with self.assertRaises(UnicodeEncodeError):
-            return f(self, *args, **kwargs)
-    return decorated
-
-
 def raises_deprecation_warning(f):
     @functools.wraps(f)
     def decorated(self, *args, **kwargs):
@@ -90,10 +70,6 @@ def expected_failure_if(condition):
 
 
 class TestARC4(unittest.TestCase):
-    # assertRaisesRegexp is renamed to assertRaisesRegex since Python 3.2.
-    if not hasattr(unittest.TestCase, 'assertRaisesRegex'):
-        assertRaisesRegex = unittest.TestCase.assertRaisesRegexp
-
     def test_arc4_module_has_doc(self):
         self.assertIsNotNone(arc4.__doc__)
 
@@ -116,35 +92,20 @@ class TestARC4(unittest.TestCase):
     def test_init_with_bytes_returns_instance(self):
         self.assertIsInstance(arc4.ARC4(b'spam'), arc4.ARC4)
 
-    @raises_unicode_encode_error_on_python_2
-    @raises_deprecation_warning_if(sys.version_info.major >= 3)
+    @raises_deprecation_warning
     def test_init_with_unicode_returns_instance(self):
         self.assertIsInstance(arc4.ARC4(u'スパム'), arc4.ARC4)
 
-    @unittest.skipUnless(hasattr(builtins, 'buffer'),
-                         'buffer only exists in Python 2')
-    @expected_failure_if(platform.python_implementation() == 'PyPy')
-    def test_init_with_buffer_returns_instance(self):
-        self.assertIsInstance(arc4.ARC4(builtins.buffer('spam')), arc4.ARC4)
-
-    @raises_deprecation_warning_if(
-            platform.python_implementation() == 'PyPy' and
-            sys.version_info.major >= 3)
+    @raises_deprecation_warning_if(platform.python_implementation() == 'PyPy')
     def test_init_with_bytearray_raises_type_error(self):
         with self.assertRaisesRegex(
                 TypeError,
                 r'argument 1 must be .*, not bytearray'):
             arc4.ARC4(bytearray([0x66, 0x6f, 0x6f]))
 
-    @raises_deprecation_warning_if(
-            platform.python_implementation() == 'PyPy' and
-            sys.version_info.major >= 3)
+    @raises_deprecation_warning_if(platform.python_implementation() == 'PyPy')
     def test_init_with_memoryview_raises_type_error(self):
-        if (platform.python_implementation() == 'PyPy' and
-                sys.version_info.major <= 2):
-            pattern = r'^must be .*, not memoryview$'
-        else:
-            pattern = r'^argument 1 must be .*, not memoryview$'
+        pattern = r'^argument 1 must be .*, not memoryview$'
         with self.assertRaisesRegex(TypeError, pattern):
             arc4.ARC4(memoryview(b'spam'))
 
@@ -165,20 +126,10 @@ class TestARC4(unittest.TestCase):
             encrypted += cipher.encrypt(c)
         self.assertEqual(LOREM_ARC4, encrypted)
 
-    @raises_unicode_encode_error_on_python_2
-    @raises_deprecation_warning_if(sys.version_info.major >= 3)
+    @raises_deprecation_warning
     def test_encrypt_with_unicode_returns_encrypted_bytes(self):
         cipher = arc4.ARC4(b'spam')
         self.assertEqual(b'Q\xcd\xb1!\xecg', cipher.encrypt(u'ハム'))
-
-    @unittest.skipUnless(hasattr(builtins, 'buffer'),
-                         'buffer only exists in Python 2')
-    def test_encrypt_with_buffer_raises_type_error(self):
-        cipher = arc4.ARC4(b'spam')
-        with self.assertRaisesRegex(
-                TypeError,
-                r'^crypt\(\) argument 1 must be .*, not buffer$'):
-            cipher.encrypt(builtins.buffer(b'ham'))
 
     def test_encrypt_with_bytearray_raises_type_error(self):
         cipher = arc4.ARC4(b'spam')
@@ -196,11 +147,8 @@ class TestARC4(unittest.TestCase):
 
     def test_encrypt_with_list_raises_type_error(self):
         cipher = arc4.ARC4(b'spam')
-        if sys.version_info.major >= 3:
-            message = (r'^crypt\(\) argument 1 must be read-only bytes-like ' +
-                       r'object, not list')
-        else:
-            message = r'^\crypt\(\) argument 1 must be .*, not list'
+        message = (r'^crypt\(\) argument 1 must be read-only bytes-like ' +
+                   r'object, not list')
         with self.assertRaisesRegex(TypeError, message):
             cipher.encrypt([0x68, 0x61, 0x6d])
 
@@ -251,28 +199,7 @@ class TestARC4(unittest.TestCase):
         self.assertEqual(LOREM, cipher.decrypt(LOREM_ARC4))
 
 
-if sys.version_info.major >= 3:
-    DocTestParser = doctest.DocTestParser
-else:
-    class DocTestParser(doctest.DocTestParser):
-        """
-        In Python 2, expecting bytes literal fails because all the
-        string-like literals' prefix is stripped.
-
-        e.g. A doctest expecting b'foo' always fails because the
-        output would be 'foo'
-
-        So this custom parser strips a prefix of literals.
-        """
-        def get_examples(self, string, name='<string>'):
-            examples = doctest.DocTestParser.get_examples(self, string, name)
-            for example in examples:
-                if example.want.startswith("b'"):
-                    example.want = example.want[1:]
-            return examples
-
-
 def load_tests(loader, tests, ignore):
     tests.addTests(doctest.DocTestSuite(arc4))
-    tests.addTests(doctest.DocFileSuite('README.rst', parser=DocTestParser()))
+    tests.addTests(doctest.DocFileSuite('README.rst'))
     return tests
