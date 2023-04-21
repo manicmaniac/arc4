@@ -5,6 +5,11 @@ on:
     tags:
     - '*.*.*'
   workflow_dispatch:
+    inputs:
+      dry-run:
+        type: boolean
+        description: Do not deploy to PyPI
+        default: true
 jobs:
   build-sdist:
     runs-on: ubuntu-20.04
@@ -79,6 +84,7 @@ jobs:
       with:
         path: wheelhouse/arc4-*-manylinux*.whl
   deploy:
+    if: ${{ github.event_name == 'push' || !github.event.inputs.dry-run }}
     needs:
     - build-sdist
     - build-wheels
@@ -90,9 +96,3 @@ jobs:
         python-version: '3.11'
     - run: pip install twine
     - uses: actions/download-artifact@v3
-    - run: twine upload --verbose artifact/*
-      env:
-        TWINE_NON_INTERACTIVE: 1
-        TWINE_REPOSITORY_URL: https://upload.pypi.org/legacy/
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
