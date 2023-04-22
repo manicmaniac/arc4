@@ -22,7 +22,7 @@ jobs:
         name: benchmark
         path: benchmark.svg
     - uses: exuanbo/actions-deploy-gist@v1
-      if: ${{ !github.event.inputs.dry-run }}
+      if: github.event.inputs.dry-run != 'true'
       with:
         token: ${{ secrets.GIST_TOKEN }}
         gist_id: '991d0c197e1cb62eec81edec65363187'
