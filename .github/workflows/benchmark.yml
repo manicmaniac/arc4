@@ -1,6 +1,12 @@
 ---
 name: Benchmark
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        type: boolean
+        description: Do not deploy image to Gist
+        default: true
 jobs:
   benchmark:
     runs-on: ubuntu-20.04
@@ -16,6 +22,7 @@ jobs:
         name: benchmark
         path: benchmark.svg
     - uses: exuanbo/actions-deploy-gist@v1
+      if: ${{ !github.event.inputs.dry-run }}
       with:
         token: ${{ secrets.GIST_TOKEN }}
         gist_id: '991d0c197e1cb62eec81edec65363187'
