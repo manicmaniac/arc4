@@ -73,7 +73,7 @@ jobs:
       with:
         path: wheelhouse/arc4-*-manylinux*.whl
   deploy:
-    if: ${{ github.event_name == 'push' || !github.event.inputs.dry-run }}
+    if: ${{ github.event_name == 'push' || github.event.inputs.dry-run != 'true' }}
     needs:
     - build-sdist
     - build-wheels
