@@ -9,7 +9,7 @@ import Crypto.Cipher.ARC4
 import arc4
 
 
-TEXT = 'x' * 1024 * 1024
+PLAIN = b'x' * 1024 * 1024
 NCPU = multiprocessing.cpu_count()
 N = NCPU * 100
 
@@ -33,7 +33,7 @@ def save_graph_image(path, labels, single_thread_values, multi_thread_values):
                                     label='{} threads'.format(NCPU))
         ax.set_yscale('log')
         ax.set_ylabel('Seconds')
-        kilobytes = len(TEXT) // 1024
+        kilobytes = len(PLAIN) // 1024
         ax.set_title('Encrypt {:,}KB * {:,} times'.format(kilobytes, N))
         ax.set_xticks(xs)
         ax.set_xticklabels(labels)
@@ -93,15 +93,15 @@ def _benchmark_multi_thread(target, iterations, thread_count, timer):
 
 
 def arc4_code():
-    arc4.ARC4('key').encrypt(TEXT)
+    arc4.ARC4(b'key').encrypt(PLAIN)
 
 
 def pycrypto_code():
-    Crypto.Cipher.ARC4.new('key').encrypt(TEXT)
+    Crypto.Cipher.ARC4.new(b'key').encrypt(PLAIN)
 
 
 def rc4_code():
-    rc4.rc4(TEXT, 'key')
+    rc4.rc4(str(PLAIN), 'key')
 
 
 if __name__ == '__main__':
@@ -114,7 +114,7 @@ if __name__ == '__main__':
                         default=None,
                         help='path to write a graph')
     args = parser.parse_args()
-    labels = ['arc4', 'pycrypto']
+    labels = ['arc4', 'pycryptodome']
     single_thread_values = [
         benchmark(arc4_code, N, 1),
         benchmark(pycrypto_code, N, 1),
