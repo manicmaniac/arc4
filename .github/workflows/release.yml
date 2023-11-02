@@ -14,7 +14,7 @@ jobs:
   build-sdist:
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4
+    - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
     - uses: actions/setup-python@v4
       with:
         python-version: '3.11'
@@ -40,7 +40,7 @@ jobs:
         - 'pypy-3.8'
         - 'pypy-3.9'
     steps:
-    - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4
+    - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
     - uses: actions/setup-python@v4
       with:
         python-version: "${{ matrix.python-version }}"
@@ -66,7 +66,7 @@ jobs:
         - pp38-pypy38_pp73
         - pp39-pypy39_pp73
     steps:
-    - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4
+    - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
     - run: /opt/python/${{ matrix.python-version }}/bin/pip wheel .
     - run: auditwheel repair arc4-*-linux*.whl --plat manylinux_2_28_x86_64
     - uses: actions/upload-artifact@v3
