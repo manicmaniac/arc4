@@ -17,7 +17,7 @@ jobs:
         python-version: '3.11'
     - run: pip install . matplotlib pycryptodome rc4
     - run: nice -19 python benchmark.py -o benchmark.svg
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: benchmark
         path: benchmark.svg

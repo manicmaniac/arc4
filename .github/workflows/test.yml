@@ -36,7 +36,7 @@ jobs:
         gcov -o build/temp.* arc4.c
         rm -f *.h.gcov
         ./cc-test-reporter format-coverage --input-type gcov --output 'coverage.${{ matrix.python-version }}.xml' .
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: coverages
         path: coverage.${{ matrix.python-version }}.xml
