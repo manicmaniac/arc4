@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
-    - uses: actions/setup-python@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: '3.11'
     - run: python setup.py sdist --verbose
@@ -41,7 +41,7 @@ jobs:
         - 'pypy-3.9'
     steps:
     - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
-    - uses: actions/setup-python@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: "${{ matrix.python-version }}"
     - run: pip install wheel
@@ -80,7 +80,7 @@ jobs:
     - build-manylinux-wheels
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/setup-python@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: '3.11'
     - run: pip install twine
