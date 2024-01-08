@@ -19,8 +19,9 @@ jobs:
       with:
         python-version: '3.11'
     - run: python setup.py sdist --verbose
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
+        name: arc4-sdist
         path: dist/arc4-*.tar.gz
   build-wheels:
     runs-on: "${{ matrix.os }}"
@@ -46,8 +47,9 @@ jobs:
         python-version: "${{ matrix.python-version }}"
     - run: pip install wheel
     - run: python setup.py bdist_wheel
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
+        name: arc4-wheels-${{ matrix.os }}-${{ matrix.python-version }}
         path: dist/*whl
   build-manylinux-wheels:
     runs-on: ubuntu-22.04
@@ -69,8 +71,9 @@ jobs:
     - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
     - run: /opt/python/${{ matrix.python-version }}/bin/pip wheel .
     - run: auditwheel repair arc4-*-linux*.whl --plat manylinux_2_28_x86_64
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
+        name: arc4-wheels-manylinux-${{ matrix.python-version }}
         path: wheelhouse/arc4-*-manylinux*.whl
   deploy:
     if: ${{ github.event_name == 'push' || github.event.inputs.dry-run != 'true' }}
@@ -84,7 +87,11 @@ jobs:
       with:
         python-version: '3.11'
     - run: pip install twine
-    - uses: actions/download-artifact@v3
+    - uses: actions/download-artifact@v4
+      with:
+        pattern: arc4-*
+        merge-multiple: true
+        path: artifact
     - run: twine upload --verbose artifact/*
       env:
         TWINE_NON_INTERACTIVE: 1
