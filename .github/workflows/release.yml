@@ -12,7 +12,7 @@ on:
         default: true
 jobs:
   build-sdist:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
     - uses: actions/setup-python@v5
@@ -50,7 +50,7 @@ jobs:
       with:
         path: dist/*whl
   build-manylinux-wheels:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
       image: quay.io/pypa/manylinux_2_28_x86_64
     strategy:
@@ -78,7 +78,7 @@ jobs:
     - build-sdist
     - build-wheels
     - build-manylinux-wheels
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/setup-python@v5
       with:
