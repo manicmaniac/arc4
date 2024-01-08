@@ -36,17 +36,18 @@ jobs:
         gcov -o build/temp.* arc4.c
         rm -f *.h.gcov
         ./cc-test-reporter format-coverage --input-type gcov --output 'coverage.${{ matrix.python-version }}.xml' .
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
-        name: coverages
+        name: coverages-${{ matrix.python-version }}
         path: coverage.${{ matrix.python-version }}.xml
   upload-coverage:
     runs-on: ubuntu-22.04
     needs: test
     steps:
-    - uses: actions/download-artifact@v3
+    - uses: actions/download-artifact@v4
       with:
-        name: coverages
+        pattern: coverages-*
+        merge-multiple: true
     - name: Install cc-test-reporter
       run: |
         curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
