@@ -32,13 +32,9 @@ jobs:
         - macOS-12
         - windows-2019
         python-version:
-        - '3.7'
-        - '3.8'
         - '3.9'
         - '3.10'
         - '3.11'
-        - 'pypy-3.7'
-        - 'pypy-3.8'
         - 'pypy-3.9'
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
