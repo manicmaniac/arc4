@@ -4,7 +4,7 @@ except ImportError:
     from distutils.core import Extension, setup
 
 
-VERSION = '0.4.0'
+VERSION = '0.5.0'
 
 
 def read_file(path):
