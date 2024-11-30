@@ -1,7 +1,3 @@
-try:
-    from setuptools.distutils.version import StrictVersion
-except ImportError:
-    from distutils.version import StrictVersion
 import doctest
 import functools
 import multiprocessing
@@ -9,6 +5,13 @@ import platform
 import textwrap
 import timeit
 import unittest
+
+try:
+    import setuptools # noqa
+except ImportError:
+    import sys
+    import unittest.mock
+    sys.modules['setuptools'] = unittest.mock.Mock()
 
 import arc4
 import setup
@@ -74,10 +77,7 @@ class TestARC4(unittest.TestCase):
         self.assertIsNotNone(arc4.__doc__)
 
     def test_arc4_version_is_strict_version(self):
-        try:
-            StrictVersion(arc4.__version__)
-        except (AttributeError, ValueError) as e:
-            self.fail(e)
+        self.assertRegex(arc4.__version__, r'^[0-9]+\.[0-9]+\.[0-9]+$')
 
     def test_arc4_version_is_equal_to_setup_version(self):
         self.assertEqual(arc4.__version__, setup.VERSION)
