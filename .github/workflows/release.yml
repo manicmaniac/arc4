@@ -12,7 +12,7 @@ on:
         default: true
 jobs:
   build-sdist:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
     - uses: actions/setup-python@v5
@@ -51,7 +51,7 @@ jobs:
         name: arc4-wheels-${{ matrix.os }}-${{ matrix.python-version }}
         path: dist/*whl
   build-manylinux-wheels:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     container:
       image: quay.io/pypa/manylinux_2_28_x86_64
     strategy:
@@ -80,7 +80,7 @@ jobs:
     - build-sdist
     - build-wheels
     - build-manylinux-wheels
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/setup-python@v5
       with:
