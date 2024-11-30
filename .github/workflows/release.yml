@@ -18,6 +18,7 @@ jobs:
     - uses: actions/setup-python@v5
       with:
         python-version: '3.13'
+    - run: pip install setuptools
     - run: python setup.py sdist --verbose
     - uses: actions/upload-artifact@v4
       with:
@@ -44,7 +45,7 @@ jobs:
     - uses: actions/setup-python@v5
       with:
         python-version: "${{ matrix.python-version }}"
-    - run: pip install wheel
+    - run: pip install setuptools wheel
     - run: python setup.py bdist_wheel
     - uses: actions/upload-artifact@v4
       with:
@@ -58,16 +59,16 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-        - cp37-cp37m
-        - cp38-cp38
         - cp39-cp39
         - cp310-cp310
         - cp311-cp311
-        - pp37-pypy37_pp73
-        - pp38-pypy38_pp73
+        - cp312-cp312
+        - cp313-cp313
         - pp39-pypy39_pp73
+        - pp310-pypy310_pp73
     steps:
     - uses: actions/checkout@v4
+    - run: pip install setuptools
     - run: /opt/python/${{ matrix.python-version }}/bin/pip wheel .
     - run: auditwheel repair arc4-*-linux*.whl --plat manylinux_2_28_x86_64
     - uses: actions/upload-artifact@v4
