@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v6
-    - uses: actions/setup-python@v5
+    - uses: actions/setup-python@v6
       with:
         python-version: '3.13'
     - run: pip install setuptools
@@ -42,7 +42,7 @@ jobs:
         - 'pypy-3.10'
     steps:
     - uses: actions/checkout@v6
-    - uses: actions/setup-python@v5
+    - uses: actions/setup-python@v6
       with:
         python-version: "${{ matrix.python-version }}"
     - run: pip install setuptools wheel
@@ -83,7 +83,7 @@ jobs:
     - build-manylinux-wheels
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/setup-python@v5
+    - uses: actions/setup-python@v6
       with:
         python-version: '3.13'
     - run: pip install twine
