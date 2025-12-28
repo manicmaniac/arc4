@@ -20,7 +20,7 @@ jobs:
         python-version: '3.13'
     - run: pip install setuptools
     - run: python setup.py sdist --verbose
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v6
       with:
         name: arc4-sdist
         path: dist/arc4-*.tar.gz
@@ -47,7 +47,7 @@ jobs:
         python-version: "${{ matrix.python-version }}"
     - run: pip install setuptools wheel
     - run: python setup.py bdist_wheel
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v6
       with:
         name: arc4-wheels-${{ matrix.os }}-${{ matrix.python-version }}
         path: dist/*whl
@@ -71,7 +71,7 @@ jobs:
     - run: pip install setuptools
     - run: /opt/python/${{ matrix.python-version }}/bin/pip wheel .
     - run: auditwheel repair arc4-*-linux*.whl --plat manylinux_2_28_x86_64
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v6
       with:
         name: arc4-wheels-manylinux-${{ matrix.python-version }}
         path: wheelhouse/arc4-*-manylinux*.whl
@@ -87,7 +87,7 @@ jobs:
       with:
         python-version: '3.13'
     - run: pip install twine
-    - uses: actions/download-artifact@v5
+    - uses: actions/download-artifact@v7
       with:
         pattern: arc4-*
         merge-multiple: true
