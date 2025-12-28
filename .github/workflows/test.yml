@@ -30,7 +30,7 @@ jobs:
       run: |
         lcov --capture --directory . --output-file coverage.info --no-external
         qlty coverage transform coverage.info --output "coverage.${{ matrix.python-version }}.jsonl"
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v6
       with:
         name: coverages-${{ matrix.python-version }}
         path: coverage.${{ matrix.python-version }}.jsonl
@@ -39,7 +39,7 @@ jobs:
     needs: test
     steps:
     - uses: actions/checkout@v6
-    - uses: actions/download-artifact@v5
+    - uses: actions/download-artifact@v7
       with:
         pattern: coverages-*
         merge-multiple: true
