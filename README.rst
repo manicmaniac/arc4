@@ -5,12 +5,12 @@ arc4
    :target: https://github.com/manicmaniac/arc4/actions/workflows/test.yml
    :alt: Test
 
-.. image:: https://api.codeclimate.com/v1/badges/e7c21db66865a6d487d0/test_coverage.svg
-   :target: https://codeclimate.com/github/manicmaniac/arc4/test_coverage
+.. image:: https://qlty.sh/gh/manicmaniac/projects/arc4/coverage.svg
+   :target: https://qlty.sh/gh/manicmaniac/projects/arc4
    :alt: Test Coverage
 
-.. image:: https://api.codeclimate.com/v1/badges/e7c21db66865a6d487d0/maintainability.svg
-   :target: https://codeclimate.com/github/manicmaniac/arc4/maintainability
+.. image:: https://qlty.sh/gh/manicmaniac/projects/arc4/maintainability.svg
+   :target: https://qlty.sh/gh/manicmaniac/projects/arc4
    :alt: Maintainability
 
 .. image:: https://readthedocs.org/projects/arc4/badge/?version=latest
