@@ -12,6 +12,8 @@ jobs:
         - '3.9'
         - '3.10'
         - '3.11'
+        - '3.12'
+        - '3.13'
         - 'pypy-3.9'
         - 'pypy-3.10'
     steps:
@@ -22,6 +24,7 @@ jobs:
     - name: Install lcov
       run: sudo apt-get update && sudo apt-get install -y lcov
     - uses: qltysh/qlty-action/install@v2
+    - run: pip install setuptools
     - run: python setup.py build_ext --inplace
       env:
         CFLAGS: --coverage
