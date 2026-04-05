@@ -2,6 +2,7 @@ import doctest
 import functools
 import multiprocessing
 import platform
+import sys
 import textwrap
 import timeit
 import unittest
@@ -96,14 +97,18 @@ class TestARC4(unittest.TestCase):
     def test_init_with_unicode_returns_instance(self):
         self.assertIsInstance(arc4.ARC4(u'スパム'), arc4.ARC4)
 
-    @raises_deprecation_warning_if(platform.python_implementation() == 'PyPy')
+    @raises_deprecation_warning_if(
+            platform.python_implementation() == 'PyPy'
+            and sys.version_info < (3, 11))
     def test_init_with_bytearray_raises_type_error(self):
         with self.assertRaisesRegex(
                 TypeError,
                 r'argument 1 must be .*, not bytearray'):
             arc4.ARC4(bytearray([0x66, 0x6f, 0x6f]))
 
-    @raises_deprecation_warning_if(platform.python_implementation() == 'PyPy')
+    @raises_deprecation_warning_if(
+            platform.python_implementation() == 'PyPy'
+            and sys.version_info < (3, 11))
     def test_init_with_memoryview_raises_type_error(self):
         pattern = r'^argument 1 must be .*, not memoryview$'
         with self.assertRaisesRegex(TypeError, pattern):
