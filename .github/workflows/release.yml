@@ -68,8 +68,8 @@ jobs:
         - pp310-pypy310_pp73
     steps:
     - uses: actions/checkout@v6
-    - run: /opt/python/${{ matrix.python-version }}/bin/pip install setuptools
-    - run: /opt/python/${{ matrix.python-version }}/bin/pip wheel .
+    - run: /opt/python/${{ matrix.python-version }}/bin/python -m pip install setuptools
+    - run: /opt/python/${{ matrix.python-version }}/bin/python -m pip wheel .
     - run: auditwheel repair arc4-*-linux*.whl --plat manylinux_2_28_x86_64
     - uses: actions/upload-artifact@v7
       with:
