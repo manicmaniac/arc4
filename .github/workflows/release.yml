@@ -39,6 +39,7 @@ jobs:
         - '3.12'
         - '3.13'
         - 'pypy-3.10'
+        - 'pypy-3.11'
     steps:
     - uses: actions/checkout@v6
     - uses: actions/setup-python@v6
@@ -63,7 +64,7 @@ jobs:
         - cp311-cp311
         - cp312-cp312
         - cp313-cp313
-        - pp310-pypy310_pp73
+        - pp311-pypy311_pp73
     steps:
     - uses: actions/checkout@v6
     - run: /opt/python/${{ matrix.python-version }}/bin/python -m pip install setuptools
