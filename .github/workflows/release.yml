@@ -30,8 +30,8 @@ jobs:
       fail-fast: false
       matrix:
         os:
-        - macOS-12
-        - windows-2019
+        - macos-14
+        - windows-2022
         python-version:
         - '3.9'
         - '3.10'
