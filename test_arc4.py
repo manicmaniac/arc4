@@ -10,7 +10,6 @@ import unittest
 try:
     import setuptools # noqa
 except ImportError:
-    import sys
     import unittest.mock
     sys.modules['setuptools'] = unittest.mock.Mock()
 
