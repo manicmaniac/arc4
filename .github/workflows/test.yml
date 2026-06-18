@@ -17,7 +17,7 @@ jobs:
         - 'pypy-3.10'
         - 'pypy-3.11'
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - uses: actions/setup-python@v6
       with:
         python-version: "${{ matrix.python-version }}"
@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-24.04
     needs: test
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - uses: actions/download-artifact@v8
       with:
         pattern: coverages-*
@@ -54,7 +54,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: clang-format
       run: clang-format --Werror --dry-run arc4.c
     - run: pip install . flake8 mypy pygments restructuredtext_lint
